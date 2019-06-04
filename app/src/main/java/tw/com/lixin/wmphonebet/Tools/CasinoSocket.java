@@ -9,7 +9,10 @@ import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import okio.ByteString;
+import tw.com.atromoby.utils.Json;
 import tw.com.atromoby.widgets.Cmd;
+import tw.com.lixin.wmphonebet.global.User;
+import tw.com.lixin.wmphonebet.jsonData.LoginData;
 
 public abstract class CasinoSocket extends WebSocketListener {
 
@@ -29,6 +32,7 @@ public abstract class CasinoSocket extends WebSocketListener {
         client.dispatcher().executorService().shutdown();
     }
 
+
     public void onSuccess(Cmd cmd){
         cmdOpen = cmd;
     }
@@ -40,9 +44,22 @@ public abstract class CasinoSocket extends WebSocketListener {
     @Override
     public void onOpen(WebSocket webSocket, Response response) {
         connected = true;
+        send(Json.to(loginData));
         if(cmdOpen != null){
             handler.post(() -> cmdOpen.exec());
         }
+
+
+        LoginData loginData = new LoginData( User.account(), pass);
+        App.socket.onSuccess(()->{
+            App.socket.send(Json.to(loginData));
+        });
+
+
+    }
+
+    public void login(String user, String pass){
+        LoginData loginData = new LoginData( User.account(), pass);
     }
 
     public abstract void onReceive(String text);
