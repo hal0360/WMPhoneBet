@@ -19,10 +19,15 @@ public class LobbySocket extends CasinoSocket {
 
     private CmdStr cmdLog;
 
-
-    public void start(){
-        init(Url.Lobby);
+    public LobbySocket(){
+        webUrl = Url.Lobby;
     }
+
+
+    public void bind(){
+
+    }
+
 
 
     @Override
@@ -31,11 +36,14 @@ public class LobbySocket extends CasinoSocket {
 
         switch(data.protocol) {
             case 35:
+
+
                 Server20 server20 = Json.from(text, Server20.class);
                 //App.curTable.stage = server20.data.gameStage;
                 if(server20.data.gameID == App.gameID && server20.data.groupID == App.groupID){
                     App.group.pro20(server20.data);
                 }
+
                 break;
             case 30:
                 Server20 server20 = Json.from(text, Server20.class);
@@ -75,7 +83,4 @@ public class LobbySocket extends CasinoSocket {
         }
     }
 
-    public void onLogin(CmdStr cmd){
-        cmdLog = cmd;
-    }
 }

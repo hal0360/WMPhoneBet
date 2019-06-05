@@ -11,62 +11,66 @@ import okhttp3.WebSocketListener;
 import okio.ByteString;
 import tw.com.atromoby.utils.Json;
 import tw.com.atromoby.widgets.Cmd;
+import tw.com.lixin.wmphonebet.App;
 import tw.com.lixin.wmphonebet.global.User;
 import tw.com.lixin.wmphonebet.jsonData.LoginData;
+import tw.com.lixin.wmphonebet.jsonData.LoginResData;
 
 public abstract class CasinoSocket extends WebSocketListener {
 
     private WebSocket webSocket = null;
-    public Cmd cmdOpen, cmdFail;
-    public Handler handler;
+    public CmdStr  cmdFail;
+    public Handler handler = new Handler();
     public boolean connected = false;
+    public LoginData loginData;
+    public String webUrl;
 
-    public CasinoSocket(){
-        handler = new Handler();
-    }
+    public CmdLog cmdOpen;
 
-    public void init(String url){
-        close();
-        OkHttpClient client = new OkHttpClient();
-        webSocket = client.newWebSocket(new Request.Builder().url(url).build(), this);
-        client.dispatcher().executorService().shutdown();
-    }
-
-
-    public void onSuccess(Cmd cmd){
+    public void onSuccess(CmdLog cmd){
         cmdOpen = cmd;
     }
 
-    public void onFail(Cmd cmd){
+    public void onFail(CmdStr cmd){
         cmdFail = cmd;
     }
 
     @Override
     public void onOpen(WebSocket webSocket, Response response) {
-        connected = true;
         send(Json.to(loginData));
-        if(cmdOpen != null){
-            handler.post(() -> cmdOpen.exec());
-        }
-
-
-        LoginData loginData = new LoginData( User.account(), pass);
-        App.socket.onSuccess(()->{
-            App.socket.send(Json.to(loginData));
-        });
-
-
     }
 
     public void login(String user, String pass){
-        LoginData loginData = new LoginData( User.account(), pass);
+        loginData = new LoginData( user, pass);
+        close();
+        OkHttpClient client = new OkHttpClient();
+        webSocket = client.newWebSocket(new Request.Builder().url(webUrl).build(), this);
+        client.dispatcher().executorService().shutdown();
     }
 
     public abstract void onReceive(String text);
 
     @Override
     public void onMessage(WebSocket webSocket, String text) {
-        onReceive(text);
+
+        if(!connected){
+            LoginResData logRespend = Json.from(text, LoginResData.class);
+            if(logRespend.protocol == 0){
+                if(logRespend.data.bOk){
+                    connected = true;
+                    if(cmdOpen != null){
+                        handler.post(() -> cmdOpen.exec(logRespend.data));
+                    }
+                }else {
+                    if(cmdFail != null){
+                        handler.post(() -> cmdFail.exec("Fail to login. Password might be wrong"));
+                    }
+                }
+            }
+
+        }else {
+            onReceive(text);
+        }
     }
 
     public void send(String message){
@@ -86,7 +90,6 @@ public abstract class CasinoSocket extends WebSocketListener {
         //   Log.e("onMessageByte", bytes.toString());
     }
 
-
     @Override
     public void onClosing(WebSocket webSocket, int code, String reason) {
         Log.e("onClosing", "bye bye");
@@ -104,8 +107,9 @@ public abstract class CasinoSocket extends WebSocketListener {
     public void onFailure(WebSocket webSocket, Throwable t, Response response) {
         Log.e("failed", t.toString());
         this.webSocket = null;
+
         if(cmdFail != null){
-            handler.post(() -> cmdFail.exec());
+            handler.post(() -> cmdFail.exec(t.toString()));
         }
     }
 

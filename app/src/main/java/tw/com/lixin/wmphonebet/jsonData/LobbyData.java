@@ -9,15 +9,10 @@ public class LobbyData {
     public Data data;
 
     public class Data {
-        public Boolean bOk;
-        public int gameID;
-        public String account;
-        public int memberID;
-        public String userName;
-        public String sid;
-
         public List<Game> gameArr;
         public float balance;
+        public int gameID;
+        public int onlinePeople;
 
     }
 }
