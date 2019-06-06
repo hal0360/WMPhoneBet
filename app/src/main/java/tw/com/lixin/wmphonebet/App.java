@@ -6,15 +6,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import tw.com.atromoby.utils.RegisterApplication;
+import tw.com.lixin.wmphonebet.Tools.CasinoSocket;
+import tw.com.lixin.wmphonebet.models.Table;
 
 public class App extends RegisterApplication {
 
-    public static CasinoSocket socket;
     public static final int gameID = 101;
     public static int groupID = 1;
     public static List<Table> tables;
     public static Table curTable;
-    public static Group group;
 
 
     //public static CoinStackBack coinBack;
@@ -23,22 +23,19 @@ public class App extends RegisterApplication {
     public void onCreate() {
         super.onCreate();
      //   coinBack = new CoinStackBack();
-        socket = new CasinoSocket();
         tables = new ArrayList<>();
 
-        group = new Group();
     }
 
     public static void logout(){
         Log.e("app logout", "caleed");
-        socket.close();
-        socket.cleanCallbacks();
+
 
     }
 
 
     public static void cleanSocketCalls(){
-        socket.cleanCallbacks();
+
     }
 
     public static Table findTable(int id){

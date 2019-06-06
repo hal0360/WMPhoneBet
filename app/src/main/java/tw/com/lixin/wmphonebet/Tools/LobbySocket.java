@@ -11,10 +11,12 @@ import okhttp3.WebSocketListener;
 import okio.ByteString;
 import tw.com.atromoby.utils.Json;
 import tw.com.atromoby.widgets.Cmd;
+import tw.com.lixin.wmphonebet.App;
 import tw.com.lixin.wmphonebet.global.Url;
 import tw.com.lixin.wmphonebet.jsonData.LobbyData;
 import tw.com.lixin.wmphonebet.jsonData.data.Game;
 import tw.com.lixin.wmphonebet.jsonData.data.TableStage;
+import tw.com.lixin.wmphonebet.models.Table;
 
 public class LobbySocket extends CasinoSocket {
 
@@ -73,10 +75,9 @@ public class LobbySocket extends CasinoSocket {
                 table.fourthRoadPreP = new FourthRoad(table.casinoRoad.sortedRoadP);
 */
                         App.tables.add(table);
+
                     }
                 }
-
-
 
                 Server20 server20 = Json.from(text, Server20.class);
                 //App.curTable.stage = server20.data.gameStage;
