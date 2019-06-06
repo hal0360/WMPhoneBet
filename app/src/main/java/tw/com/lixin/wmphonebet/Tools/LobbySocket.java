@@ -13,6 +13,8 @@ import tw.com.atromoby.utils.Json;
 import tw.com.atromoby.widgets.Cmd;
 import tw.com.lixin.wmphonebet.global.Url;
 import tw.com.lixin.wmphonebet.jsonData.LobbyData;
+import tw.com.lixin.wmphonebet.jsonData.data.Game;
+import tw.com.lixin.wmphonebet.jsonData.data.TableStage;
 
 public class LobbySocket extends CasinoSocket {
 
@@ -32,10 +34,48 @@ public class LobbySocket extends CasinoSocket {
 
     @Override
     public void onReceive(String text) {
-        LobbyData data = Json.from(text, LobbyData.class);
+        LobbyData lobbyData = Json.from(text, LobbyData.class);
 
-        switch(data.protocol) {
+        switch(lobbyData.protocol) {
             case 35:
+                Game bacGame = null;
+                for(Game game: lobbyData.data.gameArr){
+                    if (game.gameID == 101)
+                        bacGame = game;
+                }
+
+                for(TableStage tableStage: bacGame.groupArr){
+                    if ( tableStage.gameStage != 4){
+                        // CasinoRoad casinoRoad = new CasinoRoad(tableStage.historyArr);
+
+                        Table table = new Table();
+                        table.setUp(tableStage.historyArr);
+                        table.stage = tableStage.gameStage;
+                        table.groupID = tableStage.groupID;
+
+                        table.groupType = tableStage.groupType;
+
+                        table.score = tableStage.bankerScore;
+                        table.round = tableStage.gameNoRound;
+                        table.number = tableStage.gameNo;
+
+                        // table.mainRoad = road;
+                        /*
+                table.casinoRoad = casinoRoad;
+                table.secRoad = new SecRoad(table.casinoRoad.sortedRoad);
+                table.secRoadPreB = new SecRoad(table.casinoRoad.sortedRoadB);
+                table.secRoadPreP = new SecRoad(table.casinoRoad.sortedRoadP);
+                table.thirdRoad = new ThirdRoad(table.casinoRoad.sortedRoad);
+                table.thirdRoadPreB = new ThirdRoad(table.casinoRoad.sortedRoadB);
+                table.thirdRoadPreP = new ThirdRoad(table.casinoRoad.sortedRoadP);
+                table.fourthRoad = new FourthRoad(table.casinoRoad.sortedRoad);
+                table.fourthRoadPreB = new FourthRoad(table.casinoRoad.sortedRoadB);
+                table.fourthRoadPreP = new FourthRoad(table.casinoRoad.sortedRoadP);
+*/
+                        App.tables.add(table);
+                    }
+                }
+
 
 
                 Server20 server20 = Json.from(text, Server20.class);
