@@ -10,9 +10,6 @@ import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import okio.ByteString;
 import tw.com.atromoby.utils.Json;
-import tw.com.atromoby.widgets.Cmd;
-import tw.com.lixin.wmphonebet.App;
-import tw.com.lixin.wmphonebet.global.User;
 import tw.com.lixin.wmphonebet.jsonData.LoginData;
 import tw.com.lixin.wmphonebet.jsonData.LoginResData;
 

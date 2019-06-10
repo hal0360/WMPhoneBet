@@ -1,23 +1,35 @@
 package tw.com.lixin.wmphonebet.Tools;
 
+import tw.com.atromoby.utils.CountDown;
 import tw.com.atromoby.utils.Json;
-import tw.com.lixin.wmphonebet.App;
 import tw.com.lixin.wmphonebet.global.Url;
-import tw.com.lixin.wmphonebet.global.User;
-import tw.com.lixin.wmphonebet.jsonData.LobbyData;
-import tw.com.lixin.wmphonebet.jsonData.data.Game;
-import tw.com.lixin.wmphonebet.jsonData.data.TableStage;
-import tw.com.lixin.wmphonebet.models.Table;
+import tw.com.lixin.wmphonebet.jsonData.BacData;
+import tw.com.lixin.wmphonebet.jsonData.TableData;
 
-public class LobbySocket extends CasinoSocket {
+public class BacSocket extends CasinoSocket {
 
-       private LobbyBridge bridge;
+    private BacBridge bridge;
 
-    public LobbySocket(){
-        webUrl = Url.Lobby;
+
+    public boolean comission = false;
+    public boolean cardIsOpening = true;
+    public boolean isBettingNow = true;
+    public int groupID = -1;
+    public int areaID;
+    public CountDown countDownTimer;
+    public CoinStackBack leftBack, rightBack, topBack, lowRightbBack, lowLeftBack, superBack;
+    public TableData tableData;
+    public int[] pokers;
+    public int cardStatus = 0;
+    public boolean displayCard = false;
+
+
+
+    public BacSocket(){
+        webUrl = Url.Bac;
     }
 
-    public void bind(LobbyBridge bridge){
+    public void bind(BacBridge bridge){
         this.bridge = bridge;
     }
 
@@ -27,10 +39,10 @@ public class LobbySocket extends CasinoSocket {
 
     @Override
     public void onReceive(String text) {
-        LobbyData lobbyData = Json.from(text, LobbyData.class);
+        BacData bacData = Json.from(text, BacData.class);
 
-        switch(lobbyData.protocol) {
-            case 35:
+        switch(bacData.protocol) {
+            case 10:
                 Game bacGame = null;
                 for(Game game: lobbyData.data.gameArr){
                     if (game.gameID == 101)
@@ -52,16 +64,13 @@ public class LobbySocket extends CasinoSocket {
                 }
                 if(bridge != null) handler.post(() -> bridge.wholeDataUpdated());
                 break;
-            case 30:
+            case 20:
                 User.balance(lobbyData.data.balance);
                 if(bridge != null) handler.post(() -> bridge.balanceUpdated());
                 break;
-            case 34:
+            case 22:
                 if(bridge != null) handler.post(() -> bridge.peopleOnlineUpdate(lobbyData.data.onlinePeople));
                 break;
             default:
-
-        }
     }
-
 }
