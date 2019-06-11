@@ -24,6 +24,15 @@ public class BacData  {
         public HisData historyData;
         public int groupType;
         public int timeMillisecond;
+        public Map<Integer, String> dtOdds;
+        public int maxBet01;
+        public int maxBet02;
+        public int maxBet03;
+        public int maxBet04;
+        public int minBet01;
+        public int minBet02;
+        public int minBet03;
+        public int minBet04;
     }
 
     public class HisData{

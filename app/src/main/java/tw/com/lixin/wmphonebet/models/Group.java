@@ -4,7 +4,6 @@ import android.os.Handler;
 import android.util.Log;
 
 import tw.com.atromoby.utils.CountDown;
-import tw.com.lixin.wmphonebet.Tools.CasinoGroupBridge;
 import tw.com.lixin.wmphonebet.Tools.CoinStackBack;
 import tw.com.lixin.wmphonebet.global.Poker;
 import tw.com.lixin.wmphonebet.jsonData.Server10;

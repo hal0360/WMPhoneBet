@@ -21,7 +21,6 @@ public abstract class CasinoSocket extends WebSocketListener {
     public boolean connected = false;
     public LoginData loginData;
     public String webUrl;
-
     public CmdLog cmdOpen;
 
     public void onSuccess(CmdLog cmd){
@@ -68,6 +67,10 @@ public abstract class CasinoSocket extends WebSocketListener {
         }else {
             onReceive(text);
         }
+    }
+
+    public void handle(){
+
     }
 
     public void send(String message){

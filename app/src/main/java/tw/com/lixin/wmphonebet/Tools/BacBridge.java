@@ -7,12 +7,15 @@ import tw.com.lixin.wmphonebet.jsonData.Server31;
 
 public interface BacBridge {
     void cardStatusUpdate();
-    void cardAreaUpadte(Server24.Data data);
-    void balance(float value);
+    void cardAreaUpadte();
+    void balanceUpdate(float value);
     void betOK();
-    void gridUpdate(Server26.Data data);
+    void betFail();
+    void gridUpdate();
     void winLossResult(Server25.Data data);
     void moneWon(Server31.Data data);
     void betCountdown(int sec);
+    void groupLogOK();
+    void groupLogFail();
 
 }
