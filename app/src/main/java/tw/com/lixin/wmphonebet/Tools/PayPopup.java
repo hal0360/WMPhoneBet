@@ -7,7 +7,8 @@ import android.widget.ScrollView;
 import tw.com.atromoby.utils.Kit;
 import tw.com.atromoby.widgets.Popup;
 import tw.com.atromoby.widgets.SpinList;
-import tw.com.lixin.wmcasino.R;
+import tw.com.lixin.wmphonebet.R;
+
 
 public class PayPopup extends Popup {
 

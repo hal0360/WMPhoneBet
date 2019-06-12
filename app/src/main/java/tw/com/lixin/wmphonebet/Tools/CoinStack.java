@@ -14,10 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import tw.com.atromoby.utils.Kit;
-import tw.com.lixin.wmcasino.CasinoActivity;
-import tw.com.lixin.wmcasino.CoinHolder;
-import tw.com.lixin.wmcasino.R;
-import tw.com.lixin.wmcasino.jsonData.Client22;
+
+import tw.com.lixin.wmphonebet.BacActivity;
+import tw.com.lixin.wmphonebet.jsonData.Client22;
+import tw.com.lixin.wmphonebet.models.CoinHolder;
 
 @SuppressLint("SetTextI18n")
 public class CoinStack extends ConstraintLayout implements Animation.AnimationListener{
@@ -27,14 +27,10 @@ public class CoinStack extends ConstraintLayout implements Animation.AnimationLi
     private int hit = 0;
     private List<Integer> ids = new ArrayList<>();
     private TextView valTxt;
-    public int value = 0;
-    public int maxValue = 999;
-    private CasinoActivity context;
 
-    public List<CoinHolder> addedCoin;
-    public List<CoinHolder> tempAddedCoin;
+    private BacActivity context;
 
-    public CoinStackBack back;
+    public CoinStackData data;
 
     public CoinStack(Context context) {
         super(context);
@@ -47,10 +43,12 @@ public class CoinStack extends ConstraintLayout implements Animation.AnimationLi
     }
 
     private void init(Context context) {
-        this.context = (CasinoActivity) context;
+        this.context = (BacActivity) context;
 
         View.inflate(context, R.layout.coin_stack_layout, this);
+
         setDescendantFocusability(FOCUS_BLOCK_DESCENDANTS);
+
 
         this.setClipChildren(false);
         this.setClipToPadding(false);
@@ -59,7 +57,7 @@ public class CoinStack extends ConstraintLayout implements Animation.AnimationLi
         coin3 = findViewById(R.id.coin3);
         coin4 = findViewById(R.id.coin4);
         valTxt = findViewById(R.id.stack_value);
-        valTxt.setText(value + "");
+        valTxt.setText(data.value + "");
         coin1.setVisibility(View.INVISIBLE);
         coin2.setVisibility(View.INVISIBLE);
         coin3.setVisibility(View.INVISIBLE);
@@ -69,6 +67,13 @@ public class CoinStack extends ConstraintLayout implements Animation.AnimationLi
         animeDwn = AnimationUtils.loadAnimation(context, R.anim.coin_anime_down);
         animeDwn.setAnimationListener(this);
         animeUp = AnimationUtils.loadAnimation(context, R.anim.coin_anime_up);
+    }
+
+    public void setUp(CoinStackData cData){
+
+        data = cData;
+        for(CoinHolder coin: data.addedCoin) addedAdd(coin);
+        for(CoinHolder coin: data.tempAddedCoin) addedAdd(coin);
     }
 
     public void resetFromBack(CoinStackBack cback){
@@ -83,13 +88,8 @@ public class CoinStack extends ConstraintLayout implements Animation.AnimationLi
         }
     }
 
-    private void addToBack(){
-        back.addedCoin = addedCoin;
-        back.tempAddedCoin = tempAddedCoin;
-    }
-
     private void reset(){
-        value = 0;
+        data.value = 0;
         hit = 0;
         valTxt.setText(value + "");
         coin1.setVisibility(View.INVISIBLE);
@@ -127,14 +127,7 @@ public class CoinStack extends ConstraintLayout implements Animation.AnimationLi
         addToBack();
     }
 
-    private void addedAdd(CoinHolder coin){
-        value = value + coin.value;
-        if(value > maxValue){
-            value = value - coin.value;
-            Kit.alert(context, "Exceeded max value!");
-            return;
-        }
-
+    private void noAnimeAdd(){
         ids.add(coin.img_res);
         if(hit == 0){
             coin4.setImageResource(coin.img_res);
@@ -157,23 +150,32 @@ public class CoinStack extends ConstraintLayout implements Animation.AnimationLi
         }
         hit++;
         valTxt.setVisibility(View.VISIBLE);
-        valTxt.setText(value + "");
+        valTxt.setText(data.value + "");
+    }
+
+    private void addedAdd(CoinHolder coin){
+        data.value = data.value + coin.value;
+        if(data.value > data.maxValue){
+            data.value = data.value - coin.value;
+            Kit.alert(context, "Exceeded max value!");
+            return;
+        }
+        noAnimeAdd();
     }
 
     public void addCoinToClient(Client22 client22, int area){
-        for(CoinHolder coin: tempAddedCoin){
+        for(CoinHolder coin: data.tempAddedCoin){
             client22.addBet(area,coin.value);
         }
     }
 
     public void comfirmBet(){
-        addedCoin.addAll(tempAddedCoin);
-        tempAddedCoin = new ArrayList<>();
-        addToBack();
+        data.addedCoin.addAll(data.tempAddedCoin);
+        data.tempAddedCoin = new ArrayList<>();
     }
 
     public boolean isEmpty(){
-        return tempAddedCoin.size() == 0;
+        return data.tempAddedCoin.size() == 0;
     }
 
     public boolean add(CoinHolder coin){

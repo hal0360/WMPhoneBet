@@ -1,10 +1,13 @@
 package tw.com.lixin.wmphonebet.Tools;
 
 import android.util.Log;
+import android.widget.TextView;
 
 import tw.com.atromoby.utils.CountDown;
 import tw.com.atromoby.utils.Json;
+import tw.com.atromoby.widgets.Popup;
 import tw.com.lixin.wmphonebet.App;
+import tw.com.lixin.wmphonebet.R;
 import tw.com.lixin.wmphonebet.global.Poker;
 import tw.com.lixin.wmphonebet.global.Url;
 import tw.com.lixin.wmphonebet.jsonData.BacData;
@@ -41,11 +44,13 @@ public class BacSocket extends CasinoSocket {
     public int topMaxValue;
     public int superMaxValue;
 
+    public int pokerWin = -1;
 
-
+    private Popup winPopup;
 
     public BacSocket(){
         webUrl = Url.Bac;
+        winPopup = new Popup();
     }
 
     public void bind(BacBridge bridge){
@@ -137,20 +142,80 @@ public class BacSocket extends CasinoSocket {
                 if(bridge != null) handler.post(() -> bridge.cardAreaUpadte());
                 break;
             case 25:
-                int pokerWin = Move.divide(bacData.data.result);
-                if (pokerWin == 1) {
-                    pokerBall.setText(getString(R.string.banker_score));
-                    pokerBall.setBackgroundResource(R.drawable.casino_item_bt_bank);
-                } else if (pokerWin == 2) {
-                    pokerBall.setText(getString(R.string.player_score));
-                    pokerBall.setBackgroundResource(R.drawable.casino_item_bt_player);
+                pokerWin = Move.divide(bacData.data.result);
+
+                break;
+            case 26:
+
+                break;
+            case 31:
+
+                int leftVal = leftBack.
+
+
+
+                TextView mText = winPopup.findViewById(R.id.player_bet);
+                mText.setText(stackLeft.value + "");
+                mText = winPopup.findViewById(R.id.banker_bet);
+                mText.setText(stackRight.value + "");
+                mText = winPopup.findViewById(R.id.player_pair_bet);
+                mText.setText(stackBTL.value + "");
+                mText = winPopup.findViewById(R.id.banker_pair_bet);
+                mText.setText(stackBTR.value + "");
+                mText = winPopup.findViewById(R.id.tie_bet);
+                mText.setText(stackTop.value + "");
+                mText = winPopup.findViewById(R.id.super_bet);
+                mText.setText(stackSuper.value + "");
+
+                mText = winPopup.findViewById(R.id.player_win);
+                if (data.dtMoneyWin.get(2) == null) {
+                    mText.setText("");
                 } else {
-                    pokerBall.setText(getString(R.string.tie_score));
-                    pokerBall.setBackgroundResource(R.drawable.casino_item_bt_bank);
+                    mText.setText(data.dtMoneyWin.get(2) + "");
                 }
-                playerScreenScore.setText(getString(R.string.player_score) + data.playerScore);
-                bankerScreenScore.setText(getString(R.string.banker_score) + data.bankerScore);
-                pokerBall.setVisibility(View.VISIBLE);
+                mText = winPopup.findViewById(R.id.banker_win);
+                if (data.dtMoneyWin.get(1) == null) {
+                    mText.setText("");
+                } else {
+                    mText.setText(data.dtMoneyWin.get(1) + "");
+                }
+                mText = winPopup.findViewById(R.id.player_pair_win);
+                if (data.dtMoneyWin.get(5) == null) {
+                    mText.setText("");
+                } else {
+                    mText.setText(data.dtMoneyWin.get(5) + "");
+                }
+                mText = winPopup.findViewById(R.id.banker_pair_win);
+                if (data.dtMoneyWin.get(4) == null) {
+                    mText.setText("");
+                } else {
+                    mText.setText(data.dtMoneyWin.get(4) + "");
+                }
+                mText = winPopup.findViewById(R.id.tie_win);
+                if (data.dtMoneyWin.get(3) == null) {
+                    mText.setText("");
+                } else {
+                    mText.setText(data.dtMoneyWin.get(3) + "");
+                }
+                mText = winPopup.findViewById(R.id.super_win);
+                if (data.dtMoneyWin.get(8) == null) {
+                    mText.setText("");
+                } else {
+                    mText.setText(data.dtMoneyWin.get(8) + "");
+                }
+
+                mText = winPopup.findViewById(R.id.total_win_money);
+                mText.setText(data.moneyWin + "");
+                winPopup.show();
+
+
+                break;
+            case 38:
+                handler.post(() -> countDownTimer.start(bacData.data.timeMillisecond, i->{
+                    if(!cardIsOpening){
+                        if(bridge != null) bridge.betCountdown(i);
+                    }
+                }));
                 break;
         }
     }
