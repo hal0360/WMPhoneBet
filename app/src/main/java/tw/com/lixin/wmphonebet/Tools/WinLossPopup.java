@@ -10,6 +10,8 @@ public class WinLossPopup extends Popup {
 
     public WinLossPopup(Context context) {
         super(context, R.layout.win_loss_popup);
+
+
     }
 
     public void result(Server31.Data data){

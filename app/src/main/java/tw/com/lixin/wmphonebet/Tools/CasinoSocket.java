@@ -9,19 +9,22 @@ import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import okio.ByteString;
+import tw.com.atromoby.utils.Cmd;
 import tw.com.atromoby.utils.Json;
 import tw.com.lixin.wmphonebet.jsonData.LoginData;
 import tw.com.lixin.wmphonebet.jsonData.LoginResData;
 
 public abstract class CasinoSocket extends WebSocketListener {
 
+    private static CasinoSocket single_instance = null;
+
     private WebSocket webSocket = null;
-    public CmdStr  cmdFail;
-    public Handler handler = new Handler();
-    public boolean connected = false;
-    public LoginData loginData;
-    public String webUrl;
-    public CmdLog cmdOpen;
+    private CmdStr  cmdFail;
+    private Handler handler = new Handler();
+    private boolean connected = false;
+    private LoginData loginData;
+    private String webUrl;
+    private CmdLog cmdOpen;
 
     public void onSuccess(CmdLog cmd){
         cmdOpen = cmd;
@@ -43,6 +46,17 @@ public abstract class CasinoSocket extends WebSocketListener {
         webSocket = client.newWebSocket(new Request.Builder().url(webUrl).build(), this);
         client.dispatcher().executorService().shutdown();
     }
+
+
+    // static method to create instance of Singleton class
+    public static CasinoSocket getInstance()
+    {
+        if (single_instance == null)
+            single_instance = new Singleton();
+
+        return single_instance;
+    }
+
 
     public abstract void onReceive(String text);
 
@@ -69,8 +83,10 @@ public abstract class CasinoSocket extends WebSocketListener {
         }
     }
 
-    public void handle(){
-
+    public void handle(Object obj, Cmd cmd){
+        if(obj != null){
+            handler.post(cmd::exec);
+        }
     }
 
     public void send(String message){

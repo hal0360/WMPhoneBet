@@ -1,23 +1,36 @@
-package tw.com.lixin.wmphonebet.Tools;
+package tw.com.lixin.wmphonebet.websocketSource;
 
 import android.util.Log;
-import android.widget.TextView;
 
+import tw.com.atromoby.utils.Cmd;
 import tw.com.atromoby.utils.CountDown;
 import tw.com.atromoby.utils.Json;
 import tw.com.atromoby.widgets.Popup;
 import tw.com.lixin.wmphonebet.App;
-import tw.com.lixin.wmphonebet.R;
+import tw.com.lixin.wmphonebet.Tools.BacBridge;
+import tw.com.lixin.wmphonebet.Tools.CoinStackBack;
+import tw.com.lixin.wmphonebet.Tools.Move;
 import tw.com.lixin.wmphonebet.global.Poker;
 import tw.com.lixin.wmphonebet.global.Url;
 import tw.com.lixin.wmphonebet.jsonData.BacData;
 import tw.com.lixin.wmphonebet.jsonData.TableData;
 import tw.com.lixin.wmphonebet.models.Table;
 
-public class BacSocket extends CasinoSocket {
+public class BacSource extends CasinoSource{
+
+    private static BacSource single_instance = null;
+    public static BacSource getInstance()
+    {
+        if (single_instance == null) single_instance = new BacSource();
+        return single_instance;
+    }
+
+    private BacSource()
+    {
+        defineURL(Url.Bac);
+    }
 
     private BacBridge bridge;
-
     public boolean comission = false;
     public boolean cardIsOpening = true;
     public boolean isBettingNow = true;
@@ -47,11 +60,6 @@ public class BacSocket extends CasinoSocket {
 
     private Popup winPopup;
 
-    public BacSocket(){
-        webUrl = Url.Bac;
-        winPopup = new Popup();
-    }
-
     public void bind(BacBridge bridge){
         this.bridge = bridge;
     }
@@ -61,9 +69,14 @@ public class BacSocket extends CasinoSocket {
     }
 
     @Override
+    public void handle(Cmd cmd){
+        if(bridge == null) return;
+        super.handle(cmd);
+    }
+
+    @Override
     public void onReceive(String text) {
         BacData bacData = Json.from(text, BacData.class);
-
         if(bacData.data.gameID != gameID ) return;
         if(bacData.protocol == 26){
             Table ffTable = App.findTable(bacData.data.groupID);
@@ -76,11 +89,75 @@ public class BacSocket extends CasinoSocket {
                 ffTable.tieCount = bacData.data.historyData.tieCount;
                 ffTable.playPairCount = bacData.data.historyData.playerPairCount;
                 ffTable.bankPairCount = bacData.data.historyData.bankerPairCount;
-            }else{
-                Log.e("ssds", "not catched");
-            }
+            }else Log.e("ssds", "not catched");
         }
         if(bacData.data.groupID != groupID ) return;
+
+        if(bacData.protocol == 10){
+            if (bacData.data.bOk) {
+                tableLeftScore = bacData.data.dtOdds.get(2);
+                tableRightScore = bacData.data.dtOdds.get(1);
+                tableBtlScore = bacData.data.dtOdds.get(5);
+                tableBtrScore = bacData.data.dtOdds.get(4);
+                tableTopScore = bacData.data.dtOdds.get(3);
+                leftMaxValue = bacData.data.maxBet02;
+                btLMaxValue = bacData.data.maxBet04;
+                rightMaxValue = bacData.data.maxBet01;
+                btRMaxValue = bacData.data.maxBet04;
+                topMaxValue = bacData.data.maxBet03;
+                superMaxValue = bacData.data.maxBet04;
+                handle(() -> bridge.groupLogOK());
+            } else handle(() -> bridge.groupLogFail());
+        }else if(bacData.protocol == 20){
+            isBettingNow = false;
+            cardIsOpening = false;
+            displayCard = false;
+            if (bacData.data.gameStage == 1) {
+                pokers = new int[6];
+                isBettingNow = true;
+            } else if (bacData.data.gameStage == 2) {
+                cardIsOpening = true;
+                countDownTimer.cancel();
+                displayCard = true;
+            }
+            cardStatus = bacData.data.gameStage;
+            handle(() -> bridge.cardStatusUpdate());
+        }else if(bacData.protocol == 22){
+            if (bacData.data.bOk) handle(() -> bridge.betOK());
+            else handle(() -> bridge.betFail());
+        }else if(bacData.protocol == 23){
+            handle(() -> bridge.balanceUpdate(bacData.data.balance));
+        }else if(bacData.protocol == 24){
+            if (bacData.data.cardArea == 3) {
+                pokers[0] = Poker.NUM(bacData.data.cardID);
+            } else if (bacData.data.cardArea == 2) {
+                pokers[3] = Poker.NUM(bacData.data.cardID);
+            } else if (bacData.data.cardArea == 4) {
+                pokers[4] = Poker.NUM(bacData.data.cardID);
+            } else if (bacData.data.cardArea == 6) {
+                pokers[5] = Poker.NUM(bacData.data.cardID);
+            } else if (bacData.data.cardArea == 1) {
+                pokers[1] = Poker.NUM(bacData.data.cardID);
+            } else if (bacData.data.cardArea == 5) {
+                pokers[2] = Poker.NUM(bacData.data.cardID);
+            }
+            handle(() -> bridge.cardAreaUpadte());
+        }else if(bacData.protocol == 25){
+            pokerWin = Move.divide(bacData.data.result);
+        }else if(bacData.protocol == 26){
+
+        }else if(bacData.protocol == 31){
+
+        }else if(bacData.protocol == 38){
+            handle(() -> countDownTimer.start(bacData.data.timeMillisecond, i->{
+                if(!cardIsOpening){
+                    if(bridge != null) bridge.betCountdown(i);
+                }
+            }));
+        }
+
+
+
 
         switch(bacData.protocol) {
             case 10:
@@ -151,10 +228,6 @@ public class BacSocket extends CasinoSocket {
 
                 break;
             case 31:
-
-                int leftVal = leftBack.
-
-
 
                 TextView mText = winPopup.findViewById(R.id.player_bet);
                 mText.setText(stackLeft.value + "");
