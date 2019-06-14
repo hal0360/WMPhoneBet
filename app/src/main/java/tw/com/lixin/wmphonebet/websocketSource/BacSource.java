@@ -58,6 +58,8 @@ public class BacSource extends CasinoSource{
 
     public int pokerWin = -1;
 
+    public int playerScore, bankerScore;
+
     private Popup winPopup;
 
     public void bind(BacBridge bridge){
@@ -144,6 +146,9 @@ public class BacSource extends CasinoSource{
             handle(() -> bridge.cardAreaUpadte());
         }else if(bacData.protocol == 25){
             pokerWin = Move.divide(bacData.data.result);
+            playerScore = bacData.data.playerScore;
+            bankerScore = bacData.data.bankerScore;
+            handle(() -> bridge.winLossResult());
         }else if(bacData.protocol == 26){
 
         }else if(bacData.protocol == 31){
