@@ -150,7 +150,20 @@ public class BacSource extends CasinoSource{
             bankerScore = bacData.data.bankerScore;
             handle(() -> bridge.winLossResult());
         }else if(bacData.protocol == 26){
-
+            Table ffTable = App.findTable(bacData.data.groupID);
+            if(ffTable != null){
+                ffTable.setUp(bacData.data.historyArr);
+                ffTable.groupType = bacData.data.groupType;
+                ffTable.round = bacData.data.historyArr.size();
+                ffTable.playCount =  bacData.data.historyData.playerCount;
+                ffTable.bankCount = bacData.data.historyData.bankerCount;
+                ffTable.tieCount = bacData.data.historyData.tieCount;
+                ffTable.playPairCount = bacData.data.historyData.playerPairCount;
+                ffTable.bankPairCount = bacData.data.historyData.bankerPairCount;
+            }else{
+                Log.e("ssds", "not catched");
+            }
+            handle(() -> bridge.gridUpdate());
         }else if(bacData.protocol == 31){
 
         }else if(bacData.protocol == 38){
@@ -160,8 +173,6 @@ public class BacSource extends CasinoSource{
                 }
             }));
         }
-
-
 
 
         switch(bacData.protocol) {
