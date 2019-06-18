@@ -6,6 +6,7 @@ import java.util.List;
 
 import tw.com.lixin.wmphonebet.R;
 import tw.com.lixin.wmphonebet.global.Road;
+import tw.com.lixin.wmphonebet.jsonData.BacData;
 
 
 public class Table {
@@ -46,6 +47,17 @@ public class Table {
 
     public Table(){
 
+    }
+
+    public void update(BacData bacData){
+        setUp(bacData.data.historyArr);
+        groupType = bacData.data.groupType;
+        round = bacData.data.historyArr.size();
+        playCount = bacData.data.historyData.playerCount;
+        bankCount = bacData.data.historyData.bankerCount;
+        tieCount = bacData.data.historyData.tieCount;
+        playPairCount = bacData.data.historyData.playerPairCount;
+        bankPairCount = bacData.data.historyData.bankerPairCount;
     }
 
     public void setUp(List<Integer> arr){

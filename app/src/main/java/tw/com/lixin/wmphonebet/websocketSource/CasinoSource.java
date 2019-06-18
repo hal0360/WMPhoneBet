@@ -3,6 +3,8 @@ package tw.com.lixin.wmphonebet.websocketSource;
 import android.os.Handler;
 import android.util.Log;
 
+import java.util.List;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -16,6 +18,7 @@ import tw.com.lixin.wmphonebet.Tools.CmdLog;
 import tw.com.lixin.wmphonebet.Tools.CmdStr;
 import tw.com.lixin.wmphonebet.jsonData.LoginData;
 import tw.com.lixin.wmphonebet.jsonData.LoginResData;
+import tw.com.lixin.wmphonebet.models.Table;
 
 public abstract class CasinoSource extends WebSocketListener{
 
@@ -27,11 +30,13 @@ public abstract class CasinoSource extends WebSocketListener{
         private String webUrl;
         private CmdLog cmdOpen;
 
-        public void onSuccess(CmdLog cmd){
+        public static List<Table> tables;
+
+        public void onLogOK(CmdLog cmd){
             cmdOpen = cmd;
         }
 
-        public void onFail(CmdStr cmd){
+        public void onLogFail(CmdStr cmd){
             cmdFail = cmd;
         }
 
@@ -40,7 +45,7 @@ public abstract class CasinoSource extends WebSocketListener{
             send(Json.to(loginData));
         }
 
-        public void login(String user, String pass){
+        public final void login(String user, String pass){
             loginData = new LoginData( user, pass);
             close();
             OkHttpClient client = new OkHttpClient();
@@ -77,7 +82,7 @@ public abstract class CasinoSource extends WebSocketListener{
             }
         }
 
-        public void handle(Cmd cmd){
+        public void handlePost(Cmd cmd){
             handler.post(cmd::exec);
         }
 

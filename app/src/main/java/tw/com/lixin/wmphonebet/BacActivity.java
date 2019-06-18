@@ -595,6 +595,9 @@ public class BacActivity extends RootActivity implements CasinoGroupBridge {
         setTextView(R.id.play_pair_count, data.historyData.playerPairCount + "");
     }
 
+
+
+
     @Override
     public void winLossResult(Server25.Data data) {
 

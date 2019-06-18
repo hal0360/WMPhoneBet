@@ -1,7 +1,11 @@
-package tw.com.lixin.wmphonebet.Tools;
+package tw.com.lixin.wmphonebet.websocketSource;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import tw.com.atromoby.utils.Cmd;
 import tw.com.atromoby.utils.Json;
-import tw.com.lixin.wmphonebet.App;
+import tw.com.lixin.wmphonebet.Tools.LobbyBridge;
 import tw.com.lixin.wmphonebet.global.Url;
 import tw.com.lixin.wmphonebet.global.User;
 import tw.com.lixin.wmphonebet.jsonData.LobbyData;
@@ -9,13 +13,21 @@ import tw.com.lixin.wmphonebet.jsonData.data.Game;
 import tw.com.lixin.wmphonebet.jsonData.data.TableStage;
 import tw.com.lixin.wmphonebet.models.Table;
 
-public class LobbySocket extends CasinoSocket {
+public class LobbySource extends CasinoSource{
 
-       private LobbyBridge bridge;
-
-    public LobbySocket(){
-        webUrl = Url.Lobby;
+    private static LobbySource single_instance = null;
+    public static LobbySource getInstance()
+    {
+        if (single_instance == null) single_instance = new LobbySource();
+        return single_instance;
     }
+    private LobbySource() {
+        tables = new ArrayList<>();
+        defineURL(Url.Lobby);
+    }
+
+    private LobbyBridge bridge;
+    public List<Table> tables;
 
     public void bind(LobbyBridge bridge){
         this.bridge = bridge;
@@ -26,9 +38,23 @@ public class LobbySocket extends CasinoSocket {
     }
 
     @Override
+    public void handle(Cmd cmd){
+        if(bridge == null) return;
+        super.handle(cmd);
+    }
+
+    public Table findTable(int id){
+        for(Table tt: tables){
+            if(tt.groupID == id){
+                return tt;
+            }
+        }
+        return null;
+    }
+
+    @Override
     public void onReceive(String text) {
         LobbyData lobbyData = Json.from(text, LobbyData.class);
-
         switch(lobbyData.protocol) {
             case 35:
                 Game bacGame = null;
@@ -47,21 +73,20 @@ public class LobbySocket extends CasinoSocket {
                         table.score = tableStage.bankerScore;
                         table.round = tableStage.gameNoRound;
                         table.number = tableStage.gameNo;
-                        App.tables.add(table);
+                        tables.add(table);
                     }
                 }
-                if(bridge != null) handler.post(() -> bridge.wholeDataUpdated());
+                handle(() -> bridge.wholeDataUpdated());
                 break;
             case 30:
                 User.balance(lobbyData.data.balance);
-                if(bridge != null) handler.post(() -> bridge.balanceUpdated());
+                handle(() -> bridge.balanceUpdated());
                 break;
             case 34:
-                if(bridge != null) handler.post(() -> bridge.peopleOnlineUpdate(lobbyData.data.onlinePeople));
+                handle(() -> bridge.peopleOnlineUpdate(lobbyData.data.onlinePeople));
                 break;
             default:
-
         }
-    }
 
+    }
 }
