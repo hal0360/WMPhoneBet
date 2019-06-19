@@ -21,6 +21,7 @@ public class LobbySource extends CasinoSource{
         if (single_instance == null) single_instance = new LobbySource();
         return single_instance;
     }
+
     private LobbySource() {
         tables = new ArrayList<>();
         defineURL(Url.Lobby);
@@ -37,10 +38,9 @@ public class LobbySource extends CasinoSource{
         this.bridge = null;
     }
 
-    @Override
     public void handle(Cmd cmd){
         if(bridge == null) return;
-        super.handle(cmd);
+        super.handlePost(cmd);
     }
 
     public Table findTable(int id){

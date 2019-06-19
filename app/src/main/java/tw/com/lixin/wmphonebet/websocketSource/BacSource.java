@@ -61,10 +61,9 @@ public class BacSource extends CasinoSource{
 
     public int playerScore, bankerScore;
 
-    private Cmd cOk, cFail;
+    private Cmd cOk;
 
     public Table table;
-
 
     public void bind(BacBridge bridge){
         this.bridge = bridge;
@@ -85,12 +84,8 @@ public class BacSource extends CasinoSource{
         send(Json.to(client));
     }
 
-    public void onTableLogOK(Cmd cmd){
+    public void onTableLogin(Cmd cmd){
         cOk = cmd;
-    }
-
-    public void onTableLogFail(Cmd cmd){
-        cFail = cmd;
     }
 
     @Override
@@ -100,7 +95,7 @@ public class BacSource extends CasinoSource{
         if(bacData.protocol == 26){
             LobbySource source = LobbySource.getInstance();
             Table ffTable = source.findTable(bacData.data.groupID);
-            if(ffTable != null){
+            if(ffTable != null) {
                 ffTable.setUp(bacData.data.historyArr);
                 ffTable.groupType = bacData.data.groupType;
                 ffTable.round = bacData.data.historyArr.size();
@@ -126,8 +121,8 @@ public class BacSource extends CasinoSource{
                 btRMaxValue = bacData.data.maxBet04;
                 topMaxValue = bacData.data.maxBet03;
                 superMaxValue = bacData.data.maxBet04;
-                handlePost(()-> cOk.exec());
-            } else cFail.exec();
+                if(cOk != null) handlePost(()-> cOk.exec());
+            }
         }else if(bacData.protocol == 20){
             isBettingNow = false;
             cardIsOpening = false;
