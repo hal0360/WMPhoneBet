@@ -33,6 +33,10 @@ public class BacData  {
         public int minBet02;
         public int minBet03;
         public int minBet04;
+        public float moneyWinLoss;
+        public float moneyWin;
+        public int memberID;
+        public Map<Integer, String> dtMoneyWin;
     }
 
     public class HisData{

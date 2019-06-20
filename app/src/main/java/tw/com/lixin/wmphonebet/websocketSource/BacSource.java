@@ -1,6 +1,8 @@
 package tw.com.lixin.wmphonebet.websocketSource;
 
+import android.content.Context;
 import android.util.Log;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -13,9 +15,11 @@ import tw.com.lixin.wmphonebet.Tools.BacBridge;
 import tw.com.lixin.wmphonebet.Tools.CmdLog;
 import tw.com.lixin.wmphonebet.Tools.CmdStr;
 import tw.com.lixin.wmphonebet.Tools.CoinStackBack;
+import tw.com.lixin.wmphonebet.Tools.CoinStackData;
 import tw.com.lixin.wmphonebet.Tools.Move;
 import tw.com.lixin.wmphonebet.global.Poker;
 import tw.com.lixin.wmphonebet.global.Url;
+import tw.com.lixin.wmphonebet.global.User;
 import tw.com.lixin.wmphonebet.jsonData.BacData;
 import tw.com.lixin.wmphonebet.jsonData.Client10;
 import tw.com.lixin.wmphonebet.jsonData.TableData;
@@ -29,7 +33,9 @@ public class BacSource extends CasinoSource{
         if (single_instance == null) single_instance = new BacSource();
         return single_instance;
     }
-    private BacSource() {defineURL(Url.Bac);}
+    private BacSource() {
+        defineURL(Url.Bac);
+    }
 
     private BacBridge bridge;
     public boolean comission = false;
@@ -39,7 +45,10 @@ public class BacSource extends CasinoSource{
     public int gameID = 109;
     public int areaID;
     public CountDown countDownTimer;
-    public CoinStackBack leftBack, rightBack, topBack, lowRightbBack, lowLeftBack, superBack;
+   // public CoinStackBack leftBack, rightBack, topBack, lowRightbBack, lowLeftBack, superBack;\
+    public CoinStackData stackLeft, stackRight, stackBTL, stackBTR, stackTop, stackSuper;
+
+
     public TableData tableData;
     public int[] pokers;
     public int cardStatus = 0;
@@ -64,6 +73,8 @@ public class BacSource extends CasinoSource{
     private Cmd cOk;
 
     public Table table;
+
+    private Popup winPopup;
 
     public void bind(BacBridge bridge){
         this.bridge = bridge;
@@ -91,23 +102,7 @@ public class BacSource extends CasinoSource{
     @Override
     public void onReceive(String text) {
         BacData bacData = Json.from(text, BacData.class);
-        if(bacData.data.gameID != gameID ) return;
-        if(bacData.protocol == 26){
-            LobbySource source = LobbySource.getInstance();
-            Table ffTable = source.findTable(bacData.data.groupID);
-            if(ffTable != null) {
-                ffTable.setUp(bacData.data.historyArr);
-                ffTable.groupType = bacData.data.groupType;
-                ffTable.round = bacData.data.historyArr.size();
-                ffTable.playCount = bacData.data.historyData.playerCount;
-                ffTable.bankCount = bacData.data.historyData.bankerCount;
-                ffTable.tieCount = bacData.data.historyData.tieCount;
-                ffTable.playPairCount = bacData.data.historyData.playerPairCount;
-                ffTable.bankPairCount = bacData.data.historyData.bankerPairCount;
-            }else Log.e("ssds", "not catched");
-        }
-        if(bacData.data.groupID != groupID ) return;
-
+        if(bacData.data.gameID != gameID || bacData.data.groupID != groupID) return;
         if(bacData.protocol == 10){
             if (bacData.data.bOk) {
                 tableLeftScore = bacData.data.dtOdds.get(2);
@@ -124,6 +119,7 @@ public class BacSource extends CasinoSource{
                 if(cOk != null) handlePost(()-> cOk.exec());
             }
         }else if(bacData.protocol == 20){
+            if (winPopup != null) winPopup.dismiss();
             isBettingNow = false;
             cardIsOpening = false;
             displayCard = false;
@@ -163,23 +159,63 @@ public class BacSource extends CasinoSource{
             bankerScore = bacData.data.bankerScore;
             handle(() -> bridge.cardAreaUpadte());
         }else if(bacData.protocol == 26){
-            LobbySource source = LobbySource.getInstance();
-            Table ffTable = source.findTable(bacData.data.groupID);
-            if(ffTable != null){
-                ffTable.setUp(bacData.data.historyArr);
-                ffTable.groupType = bacData.data.groupType;
-                ffTable.round = bacData.data.historyArr.size();
-                ffTable.playCount =  bacData.data.historyData.playerCount;
-                ffTable.bankCount = bacData.data.historyData.bankerCount;
-                ffTable.tieCount = bacData.data.historyData.tieCount;
-                ffTable.playPairCount = bacData.data.historyData.playerPairCount;
-                ffTable.bankPairCount = bacData.data.historyData.bankerPairCount;
-            }else{
-                Log.e("ssds", "not catched");
-            }
+            table.update(bacData);
             handle(() -> bridge.gridUpdate());
         }else if(bacData.protocol == 31){
-
+            if(User.memberID() != bacData.data.memberID || bridge == null) return;
+            Context context = (Context) bridge;
+            winPopup = new Popup(context, R.layout.win_loss_popup);
+            TextView mText = winPopup.findViewById(R.id.player_bet);
+            mText.setText(stackLeft.value + "");
+            mText = winPopup.findViewById(R.id.banker_bet);
+            mText.setText(stackRight.value + "");
+            mText = winPopup.findViewById(R.id.player_pair_bet);
+            mText.setText(stackBTL.value + "");
+            mText = winPopup.findViewById(R.id.banker_pair_bet);
+            mText.setText(stackBTR.value + "");
+            mText = winPopup.findViewById(R.id.tie_bet);
+            mText.setText(stackTop.value + "");
+            mText = winPopup.findViewById(R.id.super_bet);
+            mText.setText(stackSuper.value + "");
+            mText = winPopup.findViewById(R.id.player_win);
+            if (bacData.data.dtMoneyWin.get(2) == null) {
+                mText.setText("");
+            } else {
+                mText.setText(bacData.data.dtMoneyWin.get(2) + "");
+            }
+            mText = winPopup.findViewById(R.id.banker_win);
+            if (bacData.data.dtMoneyWin.get(1) == null) {
+                mText.setText("");
+            } else {
+                mText.setText(bacData.data.dtMoneyWin.get(1) + "");
+            }
+            mText = winPopup.findViewById(R.id.player_pair_win);
+            if (bacData.data.dtMoneyWin.get(5) == null) {
+                mText.setText("");
+            } else {
+                mText.setText(bacData.data.dtMoneyWin.get(5) + "");
+            }
+            mText = winPopup.findViewById(R.id.banker_pair_win);
+            if (bacData.data.dtMoneyWin.get(4) == null) {
+                mText.setText("");
+            } else {
+                mText.setText(bacData.data.dtMoneyWin.get(4) + "");
+            }
+            mText = winPopup.findViewById(R.id.tie_win);
+            if (bacData.data.dtMoneyWin.get(3) == null) {
+                mText.setText("");
+            } else {
+                mText.setText(bacData.data.dtMoneyWin.get(3) + "");
+            }
+            mText = winPopup.findViewById(R.id.super_win);
+            if (bacData.data.dtMoneyWin.get(8) == null) {
+                mText.setText("");
+            } else {
+                mText.setText(bacData.data.dtMoneyWin.get(8) + "");
+            }
+            mText = winPopup.findViewById(R.id.total_win_money);
+            mText.setText(bacData.data.moneyWin + "");
+            winPopup.show();
         }else if(bacData.protocol == 38){
             handle(() -> countDownTimer.start(bacData.data.timeMillisecond, i->{
                 if(!cardIsOpening){

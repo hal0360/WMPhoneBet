@@ -1,10 +1,5 @@
 package tw.com.lixin.wmphonebet.Tools;
 
-import tw.com.lixin.wmphonebet.jsonData.Server24;
-import tw.com.lixin.wmphonebet.jsonData.Server25;
-import tw.com.lixin.wmphonebet.jsonData.Server26;
-import tw.com.lixin.wmphonebet.jsonData.Server31;
-
 public interface BacBridge {
     void cardStatusUpdate();
     void cardAreaUpadte();

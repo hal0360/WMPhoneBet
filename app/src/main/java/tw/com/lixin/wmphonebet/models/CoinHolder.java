@@ -3,7 +3,6 @@ package tw.com.lixin.wmphonebet.models;
 import android.view.View;
 
 import tw.com.atromoby.widgets.ItemHolder;
-import tw.com.lixin.wmphonebet.R;
 
 public class CoinHolder extends ItemHolder {
 

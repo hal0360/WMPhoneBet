@@ -4,7 +4,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import tw.com.atromoby.widgets.ItemHolder;
-import tw.com.lixin.wmphonebet.R;
 import tw.com.lixin.wmphonebet.Tools.NumberPadPopup;
 
 public class CostomCoinHolder extends ItemHolder {

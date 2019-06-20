@@ -15,7 +15,6 @@ import java.util.List;
 
 import tw.com.atromoby.utils.Kit;
 
-import tw.com.lixin.wmphonebet.BacActivity;
 import tw.com.lixin.wmphonebet.jsonData.Client22;
 import tw.com.lixin.wmphonebet.models.CoinHolder;
 
