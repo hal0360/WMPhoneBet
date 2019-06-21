@@ -5,7 +5,7 @@ import java.util.List;
 
 import tw.com.atromoby.utils.Cmd;
 import tw.com.atromoby.utils.Json;
-import tw.com.lixin.wmphonebet.Tools.LobbyBridge;
+import tw.com.lixin.wmphonebet.interfaces.LobbyBridge;
 import tw.com.lixin.wmphonebet.global.Url;
 import tw.com.lixin.wmphonebet.global.User;
 import tw.com.lixin.wmphonebet.jsonData.LobbyData;

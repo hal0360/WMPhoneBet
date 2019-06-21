@@ -1,4 +1,4 @@
-package tw.com.lixin.wmphonebet.Tools;
+package tw.com.lixin.wmphonebet.interfaces;
 
 import tw.com.lixin.wmphonebet.jsonData.LoginResData;
 

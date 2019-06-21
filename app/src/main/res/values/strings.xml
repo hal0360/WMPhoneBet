@@ -1,3 +1,65 @@
 <resources>
-    <string name="app_name">WMPhoneBet</string>
+    <string name="side_rule">Game rules</string>
+    <string name="side_ver">Version</string>
+    <string name="side_guide">Game guide</string>
+    <string name="sidee_report">Report</string>
+    <string name="side_logout">Logout</string>
+    <string name="app_name">WMCasino</string>
+    <!-- login page -->
+    <string name="user_hint">Username</string>
+    <string name="pass_hint">Password</string>
+    <string name="remember_pass">Remember Password</string>
+    <string name="login_button">Login</string>
+    <string name="guest_button">Quest Login</string>
+    <string name="user_manage_button">User Management</string>
+    <string name="user_online">Users Online</string>
+    <string name="tables">Tables</string>
+    <string name="table_with_player">Table with player</string>
+    <!-- lobby page -->
+    <string name="member">Member</string>
+    <string name="default_num">0</string>
+    <string name="default_phone">+55–121–333</string>
+    <string name="default_member">Mariko</string>
+
+    <!-- Casino page -->
+    <string name="player_score">Player</string>
+    <string name="banker_score">Banker</string>
+    <string name="super_score">Super6</string>
+    <string name="tie_score">Tie</string>
+    <string name="player_pair_score">Player pair</string>
+    <string name="banker_pair_score">Banker pair</string>
+    <string name="switch_table">Switch</string>
+    <string name="pay_money">Pay</string>
+    <string name="customer_service">Service</string>
+    <string name="table_number">No.</string>
+    <string name="custom_value">Custom Value</string>
+    <string name="Custom">custom</string>
+    <string name="confirm">Confirm</string>
+    <string name="clear">Clear</string>
+    <string name="online_pay">Online Pay</string>
+    <string name="amount">Amount</string>
+    <string name="confirm_pay">Confirm Pay</string>
+
+    <!-- report modal -->
+    <string name="pay_record">Payout records</string>
+    <string name="quota_record">Quota records</string>
+    <string name="date">Date</string>
+    <string name="game">Game</string>
+    <string name="bet">Bet</string>
+    <string name="pay">Pay</string>
+    <string name="win">Win</string>
+    <string name="replay">Replay</string>
+    <string name="type">Type</string>
+    <string name="no">No.</string>
+    <string name="before">Before</string>
+    <string name="money">Money</string>
+    <string name="balance">Balance</string>
+
+    <!-- time spinlist -->
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="last_week">Last week</string>
+    <string name="last_month">Last Month</string>
+    <string name="all_times">All time</string>
+
 </resources>

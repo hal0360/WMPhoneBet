@@ -1,4 +1,4 @@
-package tw.com.lixin.wmphonebet.Tools;
+package tw.com.lixin.wmphonebet.interfaces;
 
 public interface BacBridge {
     void cardStatusUpdate();
@@ -7,8 +7,6 @@ public interface BacBridge {
     void betOK();
     void betFail();
     void gridUpdate();
-    void winLossResult(Server25.Data data);
-    void moneWon(Server31.Data data);
     void betCountdown(int sec);
     void groupLogOK();
     void groupLogFail();

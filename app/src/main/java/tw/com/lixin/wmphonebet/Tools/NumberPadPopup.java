@@ -4,8 +4,9 @@ import android.content.Context;
 import android.widget.TextView;
 
 import tw.com.atromoby.widgets.Popup;
-import tw.com.lixin.wmcasino.R;
-import tw.com.lixin.wmcasino.models.CostomCoinHolder;
+import tw.com.lixin.wmphonebet.R;
+import tw.com.lixin.wmphonebet.models.CostomCoinHolder;
+
 
 public class NumberPadPopup extends Popup {
 

@@ -15,13 +15,13 @@ import tw.com.atromoby.utils.Json;
 import tw.com.atromoby.widgets.ItemsView;
 import tw.com.atromoby.widgets.Popup;
 import tw.com.atromoby.widgets.SpinList;
-import tw.com.lixin.wmcasino.R;
-import tw.com.lixin.wmcasino.global.Url;
-import tw.com.lixin.wmcasino.global.User;
-import tw.com.lixin.wmcasino.jsonData.ServerMoney;
-import tw.com.lixin.wmcasino.jsonData.ServerReport;
-import tw.com.lixin.wmcasino.models.QuotaHolder;
-import tw.com.lixin.wmcasino.models.RecordHolder;
+import tw.com.lixin.wmphonebet.R;
+import tw.com.lixin.wmphonebet.global.Url;
+import tw.com.lixin.wmphonebet.global.User;
+import tw.com.lixin.wmphonebet.jsonData.ServerMoney;
+import tw.com.lixin.wmphonebet.jsonData.ServerReport;
+import tw.com.lixin.wmphonebet.models.QuotaHolder;
+import tw.com.lixin.wmphonebet.models.RecordHolder;
 
 public class ReportPopup extends Popup {
 

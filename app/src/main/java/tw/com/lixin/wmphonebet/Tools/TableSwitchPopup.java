@@ -8,10 +8,11 @@ import java.util.List;
 import tw.com.atromoby.widgets.ItemsView;
 import tw.com.atromoby.widgets.Popup;
 import tw.com.atromoby.widgets.RootActivity;
-import tw.com.lixin.wmcasino.App;
-import tw.com.lixin.wmcasino.R;
-import tw.com.lixin.wmcasino.RoadHolder;
-import tw.com.lixin.wmcasino.models.Table;
+import tw.com.lixin.wmphonebet.R;
+import tw.com.lixin.wmphonebet.models.RoadHolder;
+import tw.com.lixin.wmphonebet.models.Table;
+import tw.com.lixin.wmphonebet.websocketSource.LobbySource;
+
 
 public class TableSwitchPopup extends Popup {
 
@@ -22,7 +23,10 @@ public class TableSwitchPopup extends Popup {
         ItemsView roadView = findViewById(R.id.road_item);
         List<RoadHolder> holders = new ArrayList<>();
         RootActivity activity = (RootActivity) context;
-        for(Table table: App.tables){
+
+        List<Table> tables = LobbySource.getInstance().tables;
+
+        for(Table table: tables){
             holders.add(new RoadHolder(table, activity));
         }
         roadView.add(holders);

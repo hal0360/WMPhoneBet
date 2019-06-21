@@ -1,4 +1,4 @@
-package tw.com.lixin.wmphonebet.Tools;
+package tw.com.lixin.wmphonebet.models;
 
 import java.util.ArrayList;
 import java.util.List;

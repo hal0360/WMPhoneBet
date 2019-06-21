@@ -1,21 +1,15 @@
 package tw.com.lixin.wmphonebet.websocketSource;
 
 import android.content.Context;
-import android.util.Log;
 import android.widget.TextView;
-
-import java.util.List;
 
 import tw.com.atromoby.utils.Cmd;
 import tw.com.atromoby.utils.CountDown;
 import tw.com.atromoby.utils.Json;
 import tw.com.atromoby.widgets.Popup;
-import tw.com.lixin.wmphonebet.App;
-import tw.com.lixin.wmphonebet.Tools.BacBridge;
-import tw.com.lixin.wmphonebet.Tools.CmdLog;
-import tw.com.lixin.wmphonebet.Tools.CmdStr;
-import tw.com.lixin.wmphonebet.Tools.CoinStackBack;
-import tw.com.lixin.wmphonebet.Tools.CoinStackData;
+import tw.com.lixin.wmphonebet.R;
+import tw.com.lixin.wmphonebet.interfaces.BacBridge;
+import tw.com.lixin.wmphonebet.models.CoinStackData;
 import tw.com.lixin.wmphonebet.Tools.Move;
 import tw.com.lixin.wmphonebet.global.Poker;
 import tw.com.lixin.wmphonebet.global.Url;

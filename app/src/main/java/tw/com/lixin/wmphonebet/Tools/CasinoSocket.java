@@ -11,6 +11,8 @@ import okhttp3.WebSocketListener;
 import okio.ByteString;
 import tw.com.atromoby.utils.Cmd;
 import tw.com.atromoby.utils.Json;
+import tw.com.lixin.wmphonebet.interfaces.CmdLog;
+import tw.com.lixin.wmphonebet.interfaces.CmdStr;
 import tw.com.lixin.wmphonebet.jsonData.LoginData;
 import tw.com.lixin.wmphonebet.jsonData.LoginResData;
 
@@ -19,7 +21,7 @@ public abstract class CasinoSocket extends WebSocketListener {
     private static CasinoSocket single_instance = null;
 
     private WebSocket webSocket = null;
-    private CmdStr  cmdFail;
+    private CmdStr cmdFail;
     private Handler handler = new Handler();
     private boolean connected = false;
     private LoginData loginData;
