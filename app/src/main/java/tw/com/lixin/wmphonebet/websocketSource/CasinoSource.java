@@ -3,8 +3,6 @@ package tw.com.lixin.wmphonebet.websocketSource;
 import android.os.Handler;
 import android.util.Log;
 
-import java.util.List;
-
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -14,7 +12,6 @@ import okio.ByteString;
 import tw.com.atromoby.utils.Cmd;
 import tw.com.atromoby.utils.Json;
 import tw.com.lixin.wmphonebet.interfaces.CmdLog;
-import tw.com.lixin.wmphonebet.interfaces.CmdStr;
 import tw.com.lixin.wmphonebet.jsonData.LoginData;
 import tw.com.lixin.wmphonebet.jsonData.LoginResData;
 import tw.com.lixin.wmphonebet.models.Table;
@@ -22,29 +19,20 @@ import tw.com.lixin.wmphonebet.models.Table;
 public abstract class CasinoSource extends WebSocketListener{
 
         private WebSocket webSocket = null;
-        private CmdStr cmdFail;
         private Handler handler = new Handler();
+
         private boolean connected = false;
         private LoginData loginData;
         private String webUrl;
         private CmdLog cmdOpen;
-
-        public static List<Table> tables;
-
-        public void onLogOK(CmdLog cmd){
-            cmdOpen = cmd;
-        }
-
-        public void onLogFail(CmdStr cmd){
-            cmdFail = cmd;
-        }
 
         @Override
         public void onOpen(WebSocket webSocket, Response response) {
             send(Json.to(loginData));
         }
 
-        public final void login(String user, String pass){
+        public final void login(String user, String pass, CmdLog cmdLog){
+            cmdOpen = cmdLog;
             loginData = new LoginData( user, pass);
             close();
             OkHttpClient client = new OkHttpClient();
@@ -64,18 +52,12 @@ public abstract class CasinoSource extends WebSocketListener{
             if(!connected){
                 LoginResData logRespend = Json.from(text, LoginResData.class);
                 if(logRespend.protocol == 0){
-                    if(logRespend.data.bOk){
-                        connected = true;
-                        if(cmdOpen != null){
-                            handler.post(() -> cmdOpen.exec(logRespend.data));
-                        }
-                    }else {
-                        if(cmdFail != null){
-                            handler.post(() -> cmdFail.exec("Fail to login. Password might be wrong"));
-                        }
-                    }
+                    if(logRespend.data.bOk) connected = true;
+                    if(cmdOpen != null) handler.post(() -> {
+                        cmdOpen.exec(logRespend.data);
+                        cmdOpen = null;
+                    });
                 }
-
             }else {
                 onReceive(text);
             }
@@ -120,13 +102,10 @@ public abstract class CasinoSource extends WebSocketListener{
             Log.e("failed", t.toString());
             this.webSocket = null;
 
-            if(cmdFail != null){
-                handler.post(() -> cmdFail.exec(t.toString()));
-            }
         }
 
         public void cleanCallbacks(){
-            cmdFail = null;
+
             cmdOpen = null;
             handler.removeCallbacksAndMessages(null);
         }

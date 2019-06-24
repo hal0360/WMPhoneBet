@@ -28,11 +28,17 @@ import tw.com.lixin.wmphonebet.Tools.CasinoGrid;
 import tw.com.lixin.wmphonebet.Tools.CoinStack;
 import tw.com.lixin.wmphonebet.Tools.GoldenButton;
 import tw.com.lixin.wmphonebet.Tools.Move;
+import tw.com.lixin.wmphonebet.Tools.PayPopup;
+import tw.com.lixin.wmphonebet.Tools.SettingPopup;
+import tw.com.lixin.wmphonebet.Tools.TableSwitchPopup;
+import tw.com.lixin.wmphonebet.global.User;
+import tw.com.lixin.wmphonebet.interfaces.BacBridge;
+import tw.com.lixin.wmphonebet.jsonData.Client22;
 import tw.com.lixin.wmphonebet.models.CoinHolder;
 import tw.com.lixin.wmphonebet.models.CostomCoinHolder;
 import tw.com.lixin.wmphonebet.websocketSource.BacSource;
 
-public class BacActivity extends RootActivity {
+public class BacActivity extends RootActivity implements BacBridge {
     private int posX, posY;
     private Animation fadeAnimeB;
     private Move move;
@@ -80,12 +86,12 @@ public class BacActivity extends RootActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_casino_two);
-        int orientation = getResources().getConfiguration().orientation;
-
+        setContentView(R.layout.activity_bac);
+        source = BacSource.getInstance();
         fadeAnimeB = AnimationUtils.loadAnimation(this, R.anim.prediction_fade);
+        source.bind(this);
 
-        String path = "rtmp://wmvdo.c2h6.cn/ytb" + String.format(Locale.US, "%02d", App.group.groupID) + "-1/stream1";
+        String path = "rtmp://wmvdo.c2h6.cn/ytb" + String.format(Locale.US, "%02d", source.groupID) + "-1/stream1";
         video = findViewById(R.id.player);
         video.setVideoPath(path);
         video.start();
@@ -96,7 +102,7 @@ public class BacActivity extends RootActivity {
         repeatBtn = findViewById(R.id.repeat_bet_btn);
         comissionBtn = findViewById(R.id.comission_btn);
         tableBetContainer = findViewById(R.id.table_bet_container);
-        setTextView(R.id.table_num, App.group.groupID + "");
+        setTextView(R.id.table_num, source.groupID + "");
         bankFourthSym = findViewById(R.id.bank_fourth_sym);
         bankThirdSym = findViewById(R.id.bank_third_sym);
         bankSecondSym = findViewById(R.id.bank_second_sym);
@@ -140,12 +146,12 @@ public class BacActivity extends RootActivity {
 
         resetPokers();
 
-        setTextView(R.id.gyu_shu, getString(R.string.table_number) + " " + App.curTable.number + " -- " + App.curTable.round);
-        setTextView(R.id.banker_count, App.curTable.bankCount + "");
-        setTextView(R.id.player_count, App.curTable.playCount + "");
-        setTextView(R.id.tie_count, App.curTable.tieCount + "");
-        setTextView(R.id.bank_pair_count, App.curTable.bankPairCount + "");
-        setTextView(R.id.play_pair_count, App.curTable.playPairCount + "");
+        setTextView(R.id.gyu_shu, getString(R.string.table_number) + " " + source.table.number + " -- " + source.table.round);
+        setTextView(R.id.banker_count, source.table.bankCount + "");
+        setTextView(R.id.player_count, source.table.playCount + "");
+        setTextView(R.id.tie_count, source.table.tieCount + "");
+        setTextView(R.id.bank_pair_count, source.table.bankPairCount + "");
+        setTextView(R.id.play_pair_count, source.table.playPairCount + "");
 
         treeObserve(root, v -> move = new Move(this, root));
 
@@ -174,23 +180,17 @@ public class BacActivity extends RootActivity {
                     final int curPos = coinsView.findScroll();
                     delay(200, () -> coinsView.scrollTo(curPos));
                 }
-
             }
         });
 
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            clicked(R.id.cash_btn,v->{
-                new PayPopup(this).show();
-            });
-        }
+        clicked(R.id.cash_btn,v-> new PayPopup(this).show());
 
-        App.group.setUp(this);
-        stackLeft.resetFromBack(App.group.leftBack);
-        stackRight.resetFromBack(App.group.rightBack);
-        stackTop.resetFromBack(App.group.topBack);
-        stackBTL.resetFromBack(App.group.lowLeftBack);
-        stackBTR.resetFromBack(App.group.lowRightbBack);
-        stackSuper.resetFromBack(App.group.superBack);
+        stackLeft.setUp(source.stackLeft);
+        stackRight.setUp(source.stackRight);
+        stackTop.setUp(source.stackTop);
+        stackBTL.setUp(source.stackBTL);
+        stackBTR.setUp(source.stackBTR);
+        stackSuper.setUp(source.stackSuper);
         CardStatus();
 
         clicked(R.id.table_left, v -> {
@@ -202,7 +202,6 @@ public class BacActivity extends RootActivity {
             stackRight.add(curCoin);
             checkStackEmpty();
         });
-
         clicked(R.id.table_top, v -> {
             stackTop.add(curCoin);
             checkStackEmpty();
@@ -216,42 +215,23 @@ public class BacActivity extends RootActivity {
             checkStackEmpty();
         });
         clicked(tableSuper, v -> {
-            if (App.group.comission) {
+            if (source.comission) {
                 stackSuper.add(curCoin);
                 checkStackEmpty();
             }
         });
 
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            clicked(R.id.fullscreen_btn, v -> viewZoomOut(videoContaner));
-        }
-
         clicked(R.id.fullscreen_btn, v ->{
-
             videoContaner.removeView(video);
-            delay(3000,()->{
-                videoContaner.addView(video);
-            });
-
-            //viewZoomOut(videoContaner);
+            delay(3000,()-> videoContaner.addView(video));
         });
-
-        clicked(R.id.scroll_left_btn, v -> {
-            coinsView.smoothScrollToPosition(0);
-        });
-
-        clicked(R.id.scroll_right_btn, v -> {
-            coinsView.smoothScrollToPosition(18);
-        });
-
-        clicked(R.id.back_btn, v -> {
-            onBackPressed();
-        });
+        clicked(R.id.scroll_left_btn, v -> coinsView.smoothScrollToPosition(0));
+        clicked(R.id.scroll_right_btn, v -> coinsView.smoothScrollToPosition(18));
+        clicked(R.id.back_btn, v -> onBackPressed());
 
         comissionBtn.clicked(v -> {
-
-            if (App.group.comission) {
-                App.group.comission = false;
+            if (source.comission) {
+                source.comission = false;
                 tableBetContainer.setBackgroundResource(R.drawable.table_bt);
                 comissionBtn.setImageResource(R.drawable.casino_item_btn_super6);
                 tableRight.getLayoutParams().height = tableLeft.getHeight();
@@ -259,7 +239,7 @@ public class BacActivity extends RootActivity {
                 stackSuper.cancelBet();
                 setTextView(R.id.table_right_score, bankTableScore);
             } else {
-                App.group.comission = true;
+                source.comission = true;
                 tableBetContainer.setBackgroundResource(R.drawable.table_bt_super6);
                 tableRight.getLayoutParams().height = tableTop.getHeight();
                 comissionBtn.setImageResource(R.drawable.casino_item_btn_super6_a);
@@ -269,27 +249,20 @@ public class BacActivity extends RootActivity {
             checkStackEmpty();
         });
 
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            clicked(R.id.switch_table_btn, v -> {
-                new TableSwitchPopup(this).show();
-            });
-
-        }
+        clicked(R.id.switch_table_btn, v -> new TableSwitchPopup(this).show());
 
         confirmBtn.clicked(v -> {
-
-            Client22 client22 = new Client22(App.group.groupID, App.group.areaID);
-            if (App.group.comission) {
+            Client22 client22 = new Client22(source.groupID, source.areaID);
+            if (source.comission) {
                 client22.data.commission = 1;
                 stackSuper.addCoinToClient(client22, 8);
             }
-
             stackBTR.addCoinToClient(client22, 4);
             stackTop.addCoinToClient(client22, 3);
             stackRight.addCoinToClient(client22, 1);
             stackBTL.addCoinToClient(client22, 5);
             stackLeft.addCoinToClient(client22, 2);
-            if (client22.data.betArr.size() > 0) App.socket.send(Json.to(client22));
+            if (client22.data.betArr.size() > 0) source.send(Json.to(client22));
             else alert("You haven't put any money!");
         });
 
@@ -314,41 +287,29 @@ public class BacActivity extends RootActivity {
 
         clicked(R.id.bankBtn, v -> {
             askRoad(1);
-            bankSecondSym.setImageResource(App.curTable.secGrid.resX);
-            bankThirdSym.setImageResource(App.curTable.thirdGrid.resX);
-            bankFourthSym.setImageResource(App.curTable.fourthGrid.resX);
+            bankSecondSym.setImageResource(source.table.secGrid.resX);
+            bankThirdSym.setImageResource(source.table.thirdGrid.resX);
+            bankFourthSym.setImageResource(source.table.fourthGrid.resX);
         });
 
         clicked(R.id.playBtn, v -> {
             askRoad(2);
-            playerSecondSym.setImageResource(App.curTable.secGrid.resX);
-            playerThirdSym.setImageResource(App.curTable.thirdGrid.resX);
-            playerFourthSym.setImageResource(App.curTable.fourthGrid.resX);
+            playerSecondSym.setImageResource(source.table.secGrid.resX);
+            playerThirdSym.setImageResource(source.table.thirdGrid.resX);
+            playerFourthSym.setImageResource(source.table.fourthGrid.resX);
         });
 
-        clicked(R.id.setting_btn, v -> {
-            new SettingPopup(this).show();
-        });
+        clicked(R.id.setting_btn, v -> new SettingPopup(this).show());
 
-        setTextView(R.id.table_left_score, App.group.data10.dtOdds.get(2));
-        setTextView(R.id.table_right_score, App.group.data10.dtOdds.get(1));
-        setTextView(R.id.table_bt_l_score, App.group.data10.dtOdds.get(5));
-        setTextView(R.id.table_bt_r_score, App.group.data10.dtOdds.get(4));
-        setTextView(R.id.table_top_score, App.group.data10.dtOdds.get(3));
-        bankTableScore = App.group.data10.dtOdds.get(1);
+        setTextView(R.id.table_left_score, source.tableLeftScore);
+        setTextView(R.id.table_right_score, source.tableRightScore);
+        setTextView(R.id.table_bt_l_score, source.tableBtlScore);
+        setTextView(R.id.table_bt_r_score, source.tableBtrScore);
+        setTextView(R.id.table_top_score, source.tableTopScore);
+        bankTableScore = source.tableRightScore;
         setTextView(R.id.table_bt_super_score, "12");
-        stackLeft.maxValue = App.group.data10.maxBet02;
-        stackBTL.maxValue = App.group.data10.maxBet04;
-        stackRight.maxValue = App.group.data10.maxBet01;
-        stackBTR.maxValue = App.group.data10.maxBet04;
-        stackTop.maxValue = App.group.data10.maxBet03;
-        stackSuper.maxValue = App.group.data10.maxBet04;
-        int maxBetVal = App.group.data10.maxBet01;
-        if(maxBetVal < App.group.data10.maxBet02) maxBetVal = App.group.data10.maxBet02;
-        if(maxBetVal < App.group.data10.maxBet03) maxBetVal = App.group.data10.maxBet03;
-        if(maxBetVal < App.group.data10.maxBet04) maxBetVal = App.group.data10.maxBet04;
-        setTextView(R.id.gyu_shu2, "1 - " + maxBetVal);
-        setTextView(R.id.player_money, App.group.data10.balance + "");
+        setTextView(R.id.gyu_shu2, "1 - " + source.maxBetVal);
+        setTextView(R.id.player_money, User.balance() + "");
         comissionBtn.disable(false);
 
         treeObserve(fourthGrid, v->{
@@ -395,24 +356,24 @@ public class BacActivity extends RootActivity {
 
     private void askRoad(int win) {
         clearAskViews();
-        App.curTable.askRoadThird(win);
-        App.curTable.askRoadSec(win);
-        App.curTable.askRoadFirst(win);
-        App.curTable.askRoadFourth(win);
-        if (firstGrid.width > App.curTable.firstGrid.posXX) {
-            firstV = firstGrid.insertImage(App.curTable.firstGrid.posXX, App.curTable.firstGrid.posYY, App.curTable.firstGrid.resX);
+        source.table.askRoadThird(win);
+        source.table.askRoadSec(win);
+        source.table.askRoadFirst(win);
+        source.table.askRoadFourth(win);
+        if (firstGrid.width > source.table.firstGrid.posXX) {
+            firstV = firstGrid.insertImage(source.table.firstGrid.posXX, source.table.firstGrid.posYY, source.table.firstGrid.resX);
             firstV.startAnimation(fadeAnimeB);
         }
-        if (secGrid.width > App.curTable.secGrid.posXX) {
-            secV = secGrid.insertImage(App.curTable.secGrid.posXX, App.curTable.secGrid.posYY, App.curTable.secGrid.resX);
+        if (secGrid.width > source.table.secGrid.posXX) {
+            secV = secGrid.insertImage(source.table.secGrid.posXX, source.table.secGrid.posYY, source.table.secGrid.resX);
             secV.startAnimation(fadeAnimeB);
         }
-        if (thirdGrid.width > App.curTable.thirdGrid.posXX) {
-            thirdV = thirdGrid.insertImage(App.curTable.thirdGrid.posXX, App.curTable.thirdGrid.posYY, App.curTable.thirdGrid.resX);
+        if (thirdGrid.width > source.table.thirdGrid.posXX) {
+            thirdV = thirdGrid.insertImage(source.table.thirdGrid.posXX, source.table.thirdGrid.posYY, source.table.thirdGrid.resX);
             thirdV.startAnimation(fadeAnimeB);
         }
-        if (fourthGrid.width > App.curTable.fourthGrid.posXX) {
-            fourthV = fourthGrid.insertImage(App.curTable.fourthGrid.posXX, App.curTable.fourthGrid.posYY, App.curTable.fourthGrid.resX);
+        if (fourthGrid.width > source.table.fourthGrid.posXX) {
+            fourthV = fourthGrid.insertImage(source.table.fourthGrid.posXX, source.table.fourthGrid.posYY, source.table.fourthGrid.resX);
             fourthV.startAnimation(fadeAnimeB);
         }
         if(win == 1){
@@ -442,14 +403,14 @@ public class BacActivity extends RootActivity {
 
     private void setMainGrid() {
         int indexx = 0;
-        firstGrid.drawRoad(App.curTable.firstGrid);
-        secGrid.drawRoad(App.curTable.secGrid);
-        thirdGrid.drawRoad(App.curTable.thirdGrid);
-        fourthGrid.drawRoad(App.curTable.fourthGrid);
+        firstGrid.drawRoad(source.table.firstGrid);
+        secGrid.drawRoad(source.table.secGrid);
+        thirdGrid.drawRoad(source.table.thirdGrid);
+        fourthGrid.drawRoad(source.table.fourthGrid);
         for (int x = 0; x < mainGrid.width; x++) {
             for (int y = 0; y < mainGrid.height; y++) {
-                if (indexx >= App.curTable.mainRoad.size()) return;
-                mainGrid.insertImage(x, y, App.curTable.mainRoad.get(indexx));
+                if (indexx >= source.table.mainRoad.size()) return;
+                mainGrid.insertImage(x, y, source.table.mainRoad.get(indexx));
                 indexx++;
                 posX = x;
                 posY = y;
@@ -514,5 +475,76 @@ public class BacActivity extends RootActivity {
         coinsView.add(coins);
     }
 
+    @Override
+    public void cardStatusUpdate() {
+        if (App.group.cardStatus == 0) {
+            gameStageTxt.setText("洗牌中");
+        } else if (App.group.cardStatus == 1) {
+            gameStageTxt.setText("請下注");
+            winPopup.dismiss();
+            resetPokers();
+            confirmBtn.disable(false);
+        } else if (App.group.cardStatus == 2) {
+            confirmBtn.disable(true);
+            cancelBtn.disable(true);
+            repeatBtn.disable(true);
+            if(viewIsZoomed){
+                move.back(0);
+                viewIsZoomed = false;
+            }
+            resetPokers();
+            gameStageTxt.setText("開牌中");
+        } else if (App.group.cardStatus == 3) {
+            gameStageTxt.setText("結算中");
+        } else {
 
+        }
+    }
+
+    @Override
+    public void cardAreaUpadte() {
+        for(int i = 0; i < 6; i++) {
+            if(source.pokers[i] != 0){
+                pokers[i].setImageResource(source.pokers[i]);
+                pokers[i].setVisibility(View.VISIBLE);
+            }else{
+                pokers[i].setVisibility(View.INVISIBLE);
+            }
+        }
+    }
+
+    @Override
+    public void balanceUpdate(float value) {
+
+    }
+
+    @Override
+    public void betOK() {
+
+    }
+
+    @Override
+    public void betFail() {
+
+    }
+
+    @Override
+    public void gridUpdate() {
+
+    }
+
+    @Override
+    public void betCountdown(int sec) {
+
+    }
+
+    @Override
+    public void groupLogOK() {
+
+    }
+
+    @Override
+    public void groupLogFail() {
+
+    }
 }

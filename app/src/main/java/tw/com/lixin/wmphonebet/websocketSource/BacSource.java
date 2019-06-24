@@ -7,6 +7,7 @@ import tw.com.atromoby.utils.Cmd;
 import tw.com.atromoby.utils.CountDown;
 import tw.com.atromoby.utils.Json;
 import tw.com.atromoby.widgets.Popup;
+import tw.com.lixin.wmphonebet.App;
 import tw.com.lixin.wmphonebet.R;
 import tw.com.lixin.wmphonebet.interfaces.BacBridge;
 import tw.com.lixin.wmphonebet.models.CoinStackData;
@@ -42,7 +43,6 @@ public class BacSource extends CasinoSource{
    // public CoinStackBack leftBack, rightBack, topBack, lowRightbBack, lowLeftBack, superBack;\
     public CoinStackData stackLeft, stackRight, stackBTL, stackBTR, stackTop, stackSuper;
 
-
     public TableData tableData;
     public int[] pokers;
     public int cardStatus = 0;
@@ -59,15 +59,11 @@ public class BacSource extends CasinoSource{
     public int rightMaxValue;
     public int topMaxValue;
     public int superMaxValue;
-
     public int pokerWin = -1;
-
+    public int maxBetVal;
     public int playerScore, bankerScore;
-
     private Cmd cOk;
-
     public Table table;
-
     private Popup winPopup;
 
     public void bind(BacBridge bridge){
@@ -83,14 +79,11 @@ public class BacSource extends CasinoSource{
         super.handlePost(cmd);
     }
 
-    public void tableLogin(Table table){
+    public void tableLogin(Table table, Cmd cmd){
+        cOk = cmd;
         this.table = table;
         Client10 client = new Client10(table.groupID);
         send(Json.to(client));
-    }
-
-    public void onTableLogin(Cmd cmd){
-        cOk = cmd;
     }
 
     @Override
@@ -104,13 +97,20 @@ public class BacSource extends CasinoSource{
                 tableBtlScore = bacData.data.dtOdds.get(5);
                 tableBtrScore = bacData.data.dtOdds.get(4);
                 tableTopScore = bacData.data.dtOdds.get(3);
-                leftMaxValue = bacData.data.maxBet02;
-                btLMaxValue = bacData.data.maxBet04;
-                rightMaxValue = bacData.data.maxBet01;
-                btRMaxValue = bacData.data.maxBet04;
-                topMaxValue = bacData.data.maxBet03;
-                superMaxValue = bacData.data.maxBet04;
-                if(cOk != null) handlePost(()-> cOk.exec());
+                stackLeft.maxValue = bacData.data.maxBet02;
+                stackBTL.maxValue = bacData.data.maxBet04;
+                stackRight.maxValue = bacData.data.maxBet01;
+                stackBTR.maxValue = bacData.data.maxBet04;
+                stackTop.maxValue = bacData.data.maxBet03;
+                stackSuper.maxValue = bacData.data.maxBet04;
+                maxBetVal = bacData.data.maxBet01;
+                if(maxBetVal < bacData.data.maxBet02) maxBetVal = bacData.data.maxBet02;
+                if(maxBetVal < bacData.data.maxBet03) maxBetVal = bacData.data.maxBet03;
+                if(maxBetVal < bacData.data.maxBet04) maxBetVal = bacData.data.maxBet04;
+                if(cOk != null) handlePost(()-> {
+                    cOk.exec();
+                    cOk = null;
+                });
             }
         }else if(bacData.protocol == 20){
             if (winPopup != null) winPopup.dismiss();
@@ -120,6 +120,7 @@ public class BacSource extends CasinoSource{
             if (bacData.data.gameStage == 1) {
                 pokers = new int[6];
                 isBettingNow = true;
+                pokerWin = -1;
             } else if (bacData.data.gameStage == 2) {
                 cardIsOpening = true;
                 countDownTimer.cancel();
