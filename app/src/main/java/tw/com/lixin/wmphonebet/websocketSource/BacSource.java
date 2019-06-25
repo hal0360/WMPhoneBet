@@ -1,13 +1,13 @@
 package tw.com.lixin.wmphonebet.websocketSource;
 
 import android.content.Context;
+import android.util.SparseIntArray;
 import android.widget.TextView;
 
 import tw.com.atromoby.utils.Cmd;
 import tw.com.atromoby.utils.CountDown;
 import tw.com.atromoby.utils.Json;
 import tw.com.atromoby.widgets.Popup;
-import tw.com.lixin.wmphonebet.App;
 import tw.com.lixin.wmphonebet.R;
 import tw.com.lixin.wmphonebet.interfaces.BacBridge;
 import tw.com.lixin.wmphonebet.models.CoinStackData;
@@ -17,7 +17,6 @@ import tw.com.lixin.wmphonebet.global.Url;
 import tw.com.lixin.wmphonebet.global.User;
 import tw.com.lixin.wmphonebet.jsonData.BacData;
 import tw.com.lixin.wmphonebet.jsonData.Client10;
-import tw.com.lixin.wmphonebet.jsonData.TableData;
 import tw.com.lixin.wmphonebet.models.Table;
 
 public class BacSource extends CasinoSource{
@@ -38,13 +37,9 @@ public class BacSource extends CasinoSource{
     public boolean isBettingNow = true;
     public int groupID = -1;
     public int gameID = 109;
-    public int areaID;
     public CountDown countDownTimer;
-   // public CoinStackBack leftBack, rightBack, topBack, lowRightbBack, lowLeftBack, superBack;\
     public CoinStackData stackLeft, stackRight, stackBTL, stackBTR, stackTop, stackSuper;
-
-    public TableData tableData;
-    public int[] pokers;
+    public SparseIntArray pokers;
     public int cardStatus = 0;
     public boolean displayCard = false;
 
@@ -53,12 +48,7 @@ public class BacSource extends CasinoSource{
     public String tableTopScore;
     public String tableBtlScore;
     public String tableBtrScore;
-    public int leftMaxValue;
-    public int btRMaxValue;
-    public int btLMaxValue;
-    public int rightMaxValue;
-    public int topMaxValue;
-    public int superMaxValue;
+
     public int pokerWin = -1;
     public int maxBetVal;
     public int playerScore, bankerScore;
@@ -82,6 +72,7 @@ public class BacSource extends CasinoSource{
     public void tableLogin(Table table, Cmd cmd){
         cOk = cmd;
         this.table = table;
+        groupID = table.groupID;
         Client10 client = new Client10(table.groupID);
         send(Json.to(client));
     }
@@ -92,6 +83,13 @@ public class BacSource extends CasinoSource{
         if(bacData.data.gameID != gameID || bacData.data.groupID != groupID) return;
         if(bacData.protocol == 10){
             if (bacData.data.bOk) {
+                stackSuper = new CoinStackData();
+                stackTop = new CoinStackData();
+                stackBTR = new CoinStackData();
+                stackRight = new CoinStackData();
+                stackBTL = new CoinStackData();
+                stackLeft = new CoinStackData();
+                pokers = new SparseIntArray();
                 tableLeftScore = bacData.data.dtOdds.get(2);
                 tableRightScore = bacData.data.dtOdds.get(1);
                 tableBtlScore = bacData.data.dtOdds.get(5);
@@ -118,7 +116,7 @@ public class BacSource extends CasinoSource{
             cardIsOpening = false;
             displayCard = false;
             if (bacData.data.gameStage == 1) {
-                pokers = new int[6];
+                pokers = new SparseIntArray();
                 isBettingNow = true;
                 pokerWin = -1;
             } else if (bacData.data.gameStage == 2) {
@@ -127,32 +125,19 @@ public class BacSource extends CasinoSource{
                 displayCard = true;
             }
             cardStatus = bacData.data.gameStage;
-            handle(() -> bridge.cardStatusUpdate());
+            handle(() -> bridge.statusUpdate());
         }else if(bacData.protocol == 22){
-            if (bacData.data.bOk) handle(() -> bridge.betOK());
-            else handle(() -> bridge.betFail());
+            handle(() -> bridge.betUpdate(bacData.data.bOk));
         }else if(bacData.protocol == 23){
             handle(() -> bridge.balanceUpdate(bacData.data.balance));
         }else if(bacData.protocol == 24){
-            if (bacData.data.cardArea == 3) {
-                pokers[0] = Poker.NUM(bacData.data.cardID);
-            } else if (bacData.data.cardArea == 2) {
-                pokers[3] = Poker.NUM(bacData.data.cardID);
-            } else if (bacData.data.cardArea == 4) {
-                pokers[4] = Poker.NUM(bacData.data.cardID);
-            } else if (bacData.data.cardArea == 6) {
-                pokers[5] = Poker.NUM(bacData.data.cardID);
-            } else if (bacData.data.cardArea == 1) {
-                pokers[1] = Poker.NUM(bacData.data.cardID);
-            } else if (bacData.data.cardArea == 5) {
-                pokers[2] = Poker.NUM(bacData.data.cardID);
-            }
-            handle(() -> bridge.cardAreaUpadte());
+            pokers.put(bacData.data.cardArea,Poker.NUM(bacData.data.cardID));
+            handle(() -> bridge.cardUpdate(bacData.data.cardArea, Poker.NUM(bacData.data.cardID)));
         }else if(bacData.protocol == 25){
             pokerWin = Move.divide(bacData.data.result);
             playerScore = bacData.data.playerScore;
             bankerScore = bacData.data.bankerScore;
-            handle(() -> bridge.cardAreaUpadte());
+            handle(() -> bridge.resultUpadte());
         }else if(bacData.protocol == 26){
             table.update(bacData);
             handle(() -> bridge.gridUpdate());

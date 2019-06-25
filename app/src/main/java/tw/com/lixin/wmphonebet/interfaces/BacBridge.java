@@ -1,14 +1,12 @@
 package tw.com.lixin.wmphonebet.interfaces;
 
 public interface BacBridge {
-    void cardStatusUpdate();
-    void cardAreaUpadte();
+    void statusUpdate();
+    void cardUpdate(int area, int img);
+    void resultUpadte();
     void balanceUpdate(float value);
-    void betOK();
-    void betFail();
+    void betUpdate(boolean betOK);
     void gridUpdate();
     void betCountdown(int sec);
-    void groupLogOK();
-    void groupLogFail();
 
 }

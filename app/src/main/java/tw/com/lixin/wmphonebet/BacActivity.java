@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -43,13 +44,13 @@ public class BacActivity extends RootActivity implements BacBridge {
     private Animation fadeAnimeB;
     private Move move;
     public ItemsView coinsView;
-    private Popup winPopup;
     private TextView gameStageTxt, pokerBall, playerScreenScore, bankerScreenScore;
     public CoinHolder curCoin;
     private CasinoGrid mainGrid, firstGrid, secGrid, thirdGrid, fourthGrid;
     private View logo;
 
-    private ImageView[] pokers = new ImageView[6];
+    private SparseArray<ImageView> pokers = new SparseArray<>();
+    //private ImageView[] pokers = new ImageView[6];
 
     private ConstraintLayout videoContaner, pokerContainer, countdownBox, tableBetContainer, root, tableRight, tableSuper, tableTop, tableLeft;
     private CoinStack stackLeft, stackRight, stackTop, stackBTL, stackBTR, stackSuper;
@@ -115,7 +116,6 @@ public class BacActivity extends RootActivity implements BacBridge {
         tableLeft = findViewById(R.id.table_left);
 
         countdownBox = findViewById(R.id.countdown);
-        winPopup = new Popup(this, R.layout.win_loss_popup);
         playerScreenScore = findViewById(R.id.player_screen_score);
         bankerScreenScore = findViewById(R.id.banker_screen_score);
         gameStageTxt = findViewById(R.id.stage_info_txt);
@@ -136,14 +136,13 @@ public class BacActivity extends RootActivity implements BacBridge {
         stackSuper = findViewById(R.id.table_bt_super_stack);
         pokerContainer = findViewById(R.id.poker_layout);
 
-        pokers[0] = findViewById(R.id.player_poker1);
-        pokers[1] = findViewById(R.id.player_poker2);
-        pokers[2] = findViewById(R.id.player_poker3);
-        pokers[3] = findViewById(R.id.banker_poker1);
-        pokers[4] = findViewById(R.id.banker_poker2);
-        pokers[5] = findViewById(R.id.banker_poker3);
+        pokers.put(3,findViewById(R.id.player_poker1));
+        pokers.put(1,findViewById(R.id.player_poker2));
+        pokers.put(5,findViewById(R.id.player_poker3));
+        pokers.put(2,findViewById(R.id.banker_poker1));
+        pokers.put(4,findViewById(R.id.banker_poker2));
+        pokers.put(6,findViewById(R.id.banker_poker3));
         pokerBall = findViewById(R.id.poker_ball);
-
         resetPokers();
 
         setTextView(R.id.gyu_shu, getString(R.string.table_number) + " " + source.table.number + " -- " + source.table.round);
@@ -154,7 +153,6 @@ public class BacActivity extends RootActivity implements BacBridge {
         setTextView(R.id.play_pair_count, source.table.playPairCount + "");
 
         treeObserve(root, v -> move = new Move(this, root));
-
         treeObserve(coinsView, v->{
             int coinWidth = coinsView.getHeight();
             int coinListWidth = coinsView.getWidth();
@@ -164,18 +162,6 @@ public class BacActivity extends RootActivity implements BacBridge {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-
-                switch (newState) {
-                    case RecyclerView.SCROLL_STATE_IDLE:
-                        Log.e("SCROLL", "stopped.");
-                        break;
-                    case RecyclerView.SCROLL_STATE_DRAGGING:
-                        Log.e("SCROLL", "drag.");
-                        break;
-                    case RecyclerView.SCROLL_STATE_SETTLING:
-                        Log.e("SCROLL", "settling.");
-                        break;
-                }
                 if(newState == RecyclerView.SCROLL_STATE_IDLE){
                     final int curPos = coinsView.findScroll();
                     delay(200, () -> coinsView.scrollTo(curPos));
@@ -191,7 +177,7 @@ public class BacActivity extends RootActivity implements BacBridge {
         stackBTL.setUp(source.stackBTL);
         stackBTR.setUp(source.stackBTR);
         stackSuper.setUp(source.stackSuper);
-        CardStatus();
+        statusUpdate();
 
         clicked(R.id.table_left, v -> {
             stackLeft.add(curCoin);
@@ -429,21 +415,10 @@ public class BacActivity extends RootActivity implements BacBridge {
     }
 
     public void resetPokers() {
-
-        for(int i = 0; i < 6; i++) {
-            if(App.group.pokers[i] != 0){
-                pokers[i].setImageResource(App.group.pokers[i]);
-                pokers[i].setVisibility(View.VISIBLE);
-            }else{
-                pokers[i].setVisibility(View.INVISIBLE);
-            }
-        }
-
-        if(App.group.displayCard){
-            pokerContainer.bringToFront();
-            pokerContainer.setVisibility(View.VISIBLE);
-        }else{
-            pokerContainer.setVisibility(View.INVISIBLE);
+        for(int y = 0; y < pokers.size(); y++) pokers.valueAt(y).setVisibility(View.INVISIBLE);
+        for(int i = 0; i < source.pokers.size(); i++) {
+            int key = source.pokers.keyAt(i);
+            cardUpdate(key, source.pokers.get(key));
         }
     }
 
@@ -476,15 +451,14 @@ public class BacActivity extends RootActivity implements BacBridge {
     }
 
     @Override
-    public void cardStatusUpdate() {
-        if (App.group.cardStatus == 0) {
+    public void statusUpdate() {
+        if (source.cardStatus == 0) {
             gameStageTxt.setText("洗牌中");
-        } else if (App.group.cardStatus == 1) {
+        } else if (source.cardStatus == 1) {
             gameStageTxt.setText("請下注");
-            winPopup.dismiss();
             resetPokers();
             confirmBtn.disable(false);
-        } else if (App.group.cardStatus == 2) {
+        } else if (source.cardStatus == 2) {
             confirmBtn.disable(true);
             cancelBtn.disable(true);
             repeatBtn.disable(true);
@@ -494,7 +468,7 @@ public class BacActivity extends RootActivity implements BacBridge {
             }
             resetPokers();
             gameStageTxt.setText("開牌中");
-        } else if (App.group.cardStatus == 3) {
+        } else if (source.cardStatus == 3) {
             gameStageTxt.setText("結算中");
         } else {
 
@@ -502,7 +476,10 @@ public class BacActivity extends RootActivity implements BacBridge {
     }
 
     @Override
-    public void cardAreaUpadte() {
+    public void cardUpdate(int area, int img) {
+        ImageView pokerImg = pokers.get(area);
+        pokerImg.setVisibility(View.VISIBLE);
+        pokerImg.setImageResource(img);
         for(int i = 0; i < 6; i++) {
             if(source.pokers[i] != 0){
                 pokers[i].setImageResource(source.pokers[i]);
@@ -514,7 +491,17 @@ public class BacActivity extends RootActivity implements BacBridge {
     }
 
     @Override
+    public void resultUpadte() {
+
+    }
+
+    @Override
     public void balanceUpdate(float value) {
+
+    }
+
+    @Override
+    public void betUpdate(boolean betOK) {
 
     }
 
