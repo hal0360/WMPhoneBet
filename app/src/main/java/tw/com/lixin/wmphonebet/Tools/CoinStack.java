@@ -154,6 +154,7 @@ public class CoinStack extends ConstraintLayout implements Animation.AnimationLi
             data.value = data.value - coin.value;
             return false;
         }
+
         data.tempAddedCoin.add(coin);
         valTxt.setVisibility(View.VISIBLE);
         valTxt.setText(data.value + "");
