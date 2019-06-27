@@ -61,6 +61,7 @@ public abstract class CasinoSource extends WebSocketListener{
             }else {
                 onReceive(text);
             }
+
         }
 
         public void handlePost(Cmd cmd){
