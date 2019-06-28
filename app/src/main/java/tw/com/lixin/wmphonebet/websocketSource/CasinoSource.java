@@ -44,7 +44,11 @@ public abstract class CasinoSource extends WebSocketListener{
             webUrl = url;
         }
 
-        public abstract void onReceive(String text);
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public abstract void onReceive(String text);
 
         @Override
         public void onMessage(WebSocket webSocket, String text) {

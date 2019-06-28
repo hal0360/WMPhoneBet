@@ -96,6 +96,7 @@ public class CoinStack extends ConstraintLayout implements Animation.AnimationLi
             repeatCoin.add(coin);
         }
         data.tempAddedCoin.addAll(repeatCoin);
+
     }
 
     private void noAnimeAdd(CoinHolder coin){

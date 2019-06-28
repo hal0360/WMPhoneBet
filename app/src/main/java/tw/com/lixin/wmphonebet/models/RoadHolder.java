@@ -29,14 +29,14 @@ public class RoadHolder extends ItemHolder {
 
         clicked(R.id.road_pop_grid,v->{
 
-            App.groupID = table.groupID;
-            App.curTable = table;
+           // App.groupID = table.groupID;
+          //  App.curTable = table;
 
            // Client10 client = new Client10(table.groupID);
            // App.socket.send(Json.to(client));
             App.cleanSocketCalls();
 
-            activity.toActivity(CasinoActivity.class);
+           // activity.toActivity(CasinoActivity.class);
         });
 
 

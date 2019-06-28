@@ -2,12 +2,10 @@ package tw.com.lixin.wmphonebet;
 
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.List;
+
 
 import tw.com.atromoby.utils.RegisterApplication;
-import tw.com.lixin.wmphonebet.Tools.CasinoSocket;
-import tw.com.lixin.wmphonebet.models.Table;
+
 
 public class App extends RegisterApplication {
 

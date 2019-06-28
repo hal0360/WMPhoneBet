@@ -3,6 +3,8 @@ package tw.com.lixin.wmphonebet.models;
 import android.view.View;
 
 import tw.com.atromoby.widgets.ItemHolder;
+import tw.com.lixin.wmphonebet.BacActivity;
+import tw.com.lixin.wmphonebet.R;
 
 public class CoinHolder extends ItemHolder {
 
@@ -25,7 +27,7 @@ public class CoinHolder extends ItemHolder {
         clicked(R.id.coin, v -> {
             if(!selected){
                 selected = true;
-                CasinoActivity act = (CasinoActivity) getContex();
+                BacActivity act = (BacActivity) getContex();
                 act.curCoin.selected = false;
                 act.curCoin = this;
                 act.coinsView.refresh();

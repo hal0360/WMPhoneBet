@@ -480,6 +480,7 @@ public class BacActivity extends RootActivity implements BacBridge {
         ImageView pokerImg = pokers.get(area);
         pokerImg.setVisibility(View.VISIBLE);
         pokerImg.setImageResource(img);
+        /*
         for(int i = 0; i < 6; i++) {
             if(source.pokers[i] != 0){
                 pokers[i].setImageResource(source.pokers[i]);
@@ -487,7 +488,7 @@ public class BacActivity extends RootActivity implements BacBridge {
             }else{
                 pokers[i].setVisibility(View.INVISIBLE);
             }
-        }
+        }*/
     }
 
     @Override
@@ -505,15 +506,6 @@ public class BacActivity extends RootActivity implements BacBridge {
 
     }
 
-    @Override
-    public void betOK() {
-
-    }
-
-    @Override
-    public void betFail() {
-
-    }
 
     @Override
     public void gridUpdate() {
@@ -525,13 +517,4 @@ public class BacActivity extends RootActivity implements BacBridge {
 
     }
 
-    @Override
-    public void groupLogOK() {
-
-    }
-
-    @Override
-    public void groupLogFail() {
-
-    }
 }

@@ -10,6 +10,7 @@ import tw.com.atromoby.utils.Json;
 import tw.com.atromoby.widgets.Popup;
 import tw.com.lixin.wmphonebet.R;
 import tw.com.lixin.wmphonebet.interfaces.BacBridge;
+import tw.com.lixin.wmphonebet.interfaces.CmdBool;
 import tw.com.lixin.wmphonebet.models.CoinStackData;
 import tw.com.lixin.wmphonebet.Tools.Move;
 import tw.com.lixin.wmphonebet.global.Poker;
@@ -37,6 +38,7 @@ public class BacSource extends CasinoSource{
     public boolean isBettingNow = true;
     public int groupID = -1;
     public int gameID = 109;
+    public int areaID;
     public CountDown countDownTimer;
     public CoinStackData stackLeft, stackRight, stackBTL, stackBTR, stackTop, stackSuper;
     public SparseIntArray pokers;
@@ -52,7 +54,7 @@ public class BacSource extends CasinoSource{
     public int pokerWin = -1;
     public int maxBetVal;
     public int playerScore, bankerScore;
-    private Cmd cOk;
+    private CmdBool cOk;
     public Table table;
     private Popup winPopup;
 
@@ -69,7 +71,7 @@ public class BacSource extends CasinoSource{
         super.handlePost(cmd);
     }
 
-    public void tableLogin(Table table, Cmd cmd){
+    public void tableLogin(Table table, CmdBool cmd){
         cOk = cmd;
         this.table = table;
         groupID = table.groupID;
@@ -105,11 +107,11 @@ public class BacSource extends CasinoSource{
                 if(maxBetVal < bacData.data.maxBet02) maxBetVal = bacData.data.maxBet02;
                 if(maxBetVal < bacData.data.maxBet03) maxBetVal = bacData.data.maxBet03;
                 if(maxBetVal < bacData.data.maxBet04) maxBetVal = bacData.data.maxBet04;
-                if(cOk != null) handlePost(()-> {
-                    cOk.exec();
-                    cOk = null;
-                });
             }
+            if(cOk != null) handlePost(()-> {
+                cOk.exec(bacData.data.bOk);
+                cOk = null;
+            });
         }else if(bacData.protocol == 20){
             if (winPopup != null) winPopup.dismiss();
             isBettingNow = false;

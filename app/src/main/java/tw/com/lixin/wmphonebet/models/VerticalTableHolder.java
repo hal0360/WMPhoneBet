@@ -6,12 +6,13 @@ import android.widget.TextView;
 
 import java.util.Locale;
 
-import tw.com.atromoby.utils.Json;
+import tw.com.atromoby.utils.Kit;
 import tw.com.atromoby.widgets.ItemHolder;
-import tw.com.lixin.wmphonebet.App;
+import tw.com.atromoby.widgets.RootActivity;
+import tw.com.lixin.wmphonebet.BacActivity;
 import tw.com.lixin.wmphonebet.R;
 import tw.com.lixin.wmphonebet.Tools.CasinoGrid;
-import tw.com.lixin.wmphonebet.jsonData.Client10;
+import tw.com.lixin.wmphonebet.websocketSource.BacSource;
 
 
 public class VerticalTableHolder extends ItemHolder {
@@ -50,15 +51,23 @@ public class VerticalTableHolder extends ItemHolder {
 
 
         clicked(R.id.table_grid,v->{
-            App.curTable = table;
-            App.groupID = table.groupID;
-
-            Client10 client = new Client10(table.groupID);
-            App.socket.send(Json.to(client));
-
+            tableLog();
         });
 
     }
+
+    private void tableLog(){
+        BacSource source = BacSource.getInstance();
+        source.tableLogin(table, ok->{
+            if(ok){
+                RootActivity rootActivity = (RootActivity) getContex();
+                rootActivity.pushActivity(BacActivity.class);
+            }else{
+                Kit.alert(getContex(),"Cannot login to table");
+            }
+        });
+    }
+
 
     @Override
     public void onRecycle() {

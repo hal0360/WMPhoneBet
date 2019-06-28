@@ -4,6 +4,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import tw.com.atromoby.widgets.ItemHolder;
+import tw.com.lixin.wmphonebet.BacActivity;
+import tw.com.lixin.wmphonebet.R;
 import tw.com.lixin.wmphonebet.Tools.NumberPadPopup;
 
 public class CostomCoinHolder extends ItemHolder {
@@ -25,7 +27,7 @@ public class CostomCoinHolder extends ItemHolder {
 
             if(!coinHolder.selected){
                 coinHolder.selected = true;
-                CasinoActivity act = (CasinoActivity) getContex();
+                BacActivity act = (BacActivity) getContex();
                 act.curCoin.selected = false;
                 act.curCoin = coinHolder;
                 act.coinsView.refresh();

@@ -19,7 +19,8 @@
         </activity>
         <activity android:name=".BacActivity" />
         <activity android:name=".LoginActivity" />
-        <activity android:name=".LoadActivity"></activity>
+        <activity android:name=".LoadActivity" />
+        <activity android:name=".LobbyActivity"></activity>
     </application>
 
 </manifest>

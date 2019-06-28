@@ -36,6 +36,7 @@ public class LoginActivity extends RootActivity {
 
         userIn = findViewById(R.id.userInput);
         passIn = findViewById(R.id.passInput);
+
         accountSwitch = findViewById(R.id.accountSwitch);
         accountSwitch.setChecked(Setting.savePassword());
         if(Setting.savePassword()) passIn.setText(Setting.remPass());

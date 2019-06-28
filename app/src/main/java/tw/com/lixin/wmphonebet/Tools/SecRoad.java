@@ -2,7 +2,7 @@ package tw.com.lixin.wmphonebet.Tools;
 
 import java.util.List;
 
-import tw.com.lixin.wmcasino.global.Road;
+import tw.com.lixin.wmphonebet.global.Road;
 
 public class SecRoad {
 
