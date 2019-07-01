@@ -1,5 +1,7 @@
 package tw.com.lixin.wmphonebet.websocketSource;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,12 +56,13 @@ public class LobbySource extends CasinoSource{
 
     @Override
     public void onReceive(String text) {
+        Log.e("lobbySocket", text);
         LobbyData lobbyData = Json.from(text, LobbyData.class);
         switch(lobbyData.protocol) {
             case 35:
                 Game bacGame = null;
                 for(Game game: lobbyData.data.gameArr){
-                    if (game.gameID == 101)
+                    if (game.gameID == 301)
                         bacGame = game;
                 }
                 if(bacGame == null) return;

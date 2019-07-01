@@ -12,28 +12,40 @@ import okio.ByteString;
 import tw.com.atromoby.utils.Cmd;
 import tw.com.atromoby.utils.Json;
 import tw.com.lixin.wmphonebet.interfaces.CmdLog;
+import tw.com.lixin.wmphonebet.interfaces.CmdStr;
 import tw.com.lixin.wmphonebet.jsonData.LoginData;
 import tw.com.lixin.wmphonebet.jsonData.LoginResData;
-import tw.com.lixin.wmphonebet.models.Table;
 
 public abstract class CasinoSource extends WebSocketListener{
 
         private WebSocket webSocket = null;
-        private Handler handler = new Handler();
+        private Handler genHandler = new Handler();
+
+        private Handler logHandler = new Handler();
 
         private boolean connected = false;
-        private LoginData loginData;
+        private String loginDataStr;
         private String webUrl;
-        private CmdLog cmdOpen;
+        private CmdLog cmdLogOpen;
+        private CmdStr cmdLogFail;
 
         @Override
         public void onOpen(WebSocket webSocket, Response response) {
-            send(Json.to(loginData));
+            send(loginDataStr);
         }
 
-        public final void login(String user, String pass, CmdLog cmdLog){
-            cmdOpen = cmdLog;
-            loginData = new LoginData( user, pass);
+        public final void login(String user, String pass, CmdLog logOK, CmdStr logFail){
+            cmdLogOpen = logOK;
+            cmdLogFail = logFail;
+            logHandler.postDelayed(()-> {
+                close();
+                cmdLogOpen = null;
+                if(cmdLogFail != null){
+                    cmdLogFail.exec("Websocket login timeout");
+                    cmdLogFail = null;
+                }
+            },6000);
+            loginDataStr = Json.to(new LoginData( user, pass));
             close();
             OkHttpClient client = new OkHttpClient();
             webSocket = client.newWebSocket(new Request.Builder().url(webUrl).build(), this);
@@ -50,17 +62,24 @@ public abstract class CasinoSource extends WebSocketListener{
 
     public abstract void onReceive(String text);
 
+
         @Override
         public void onMessage(WebSocket webSocket, String text) {
+
+            Log.e("webSocket", text);
 
             if(!connected){
                 LoginResData logRespend = Json.from(text, LoginResData.class);
                 if(logRespend.protocol == 0){
+                    logHandler.removeCallbacksAndMessages(null);
                     if(logRespend.data.bOk) connected = true;
-                    if(cmdOpen != null) handler.post(() -> {
-                        cmdOpen.exec(logRespend.data);
-                        cmdOpen = null;
+                    cmdLogFail = null;
+                    if(cmdLogOpen != null) genHandler.post(() -> {
+                       // Log.e("webSocket", "hjhjhjhj");
+                        cmdLogOpen.exec(logRespend.data);
+                        cmdLogOpen = null;
                     });
+
                 }
             }else {
                 onReceive(text);
@@ -69,7 +88,7 @@ public abstract class CasinoSource extends WebSocketListener{
         }
 
         public void handlePost(Cmd cmd){
-            handler.post(cmd::exec);
+            genHandler.post(cmd::exec);
         }
 
         public void send(String message){
@@ -105,13 +124,22 @@ public abstract class CasinoSource extends WebSocketListener{
         @Override
         public void onFailure(WebSocket webSocket, Throwable t, Response response) {
             Log.e("failed", t.toString());
+            cmdLogOpen = null;
+            logHandler.post(()-> {
+                if(cmdLogFail != null){
+                    cmdLogFail.exec(t.toString());
+                    cmdLogFail = null;
+                }
+            });
+            if(cmdLogFail != null) cmdLogFail.exec("Websocket login timeout");
             this.webSocket = null;
 
         }
 
         public void cleanCallbacks(){
-
-            cmdOpen = null;
-            handler.removeCallbacksAndMessages(null);
+            cmdLogOpen = null;
+            cmdLogFail = null;
+            genHandler.removeCallbacksAndMessages(null);
+            logHandler.removeCallbacksAndMessages(null);
         }
 }

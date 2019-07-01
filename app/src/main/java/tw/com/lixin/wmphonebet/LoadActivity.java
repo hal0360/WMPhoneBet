@@ -1,6 +1,7 @@
 package tw.com.lixin.wmphonebet;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
@@ -31,8 +32,9 @@ public class LoadActivity extends RootActivity implements LobbyBridge {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_load);
 
+
         source = LobbySource.getInstance();
-        source.bind(this);
+       // source.bind(this);
         loadings.put("loading1", R.drawable.loading1);
         loadings.put("loading2", R.drawable.loading2);
         loadings.put("loading3", R.drawable.loading3);
@@ -67,18 +69,25 @@ public class LoadActivity extends RootActivity implements LobbyBridge {
         loadImg = findViewById(R.id.load_img);
         recurLoad(1);
 
-        source.login(User.userName(), pass, log ->{
+        source.login(User.account(), pass, log ->{
             if(log.bOk){
                 User.account(log.account);
                 User.gameID(log.gameID);
                 User.userName(log.userName);
                 User.memberID(log.memberID);
                 User.sid(log.sid);
+
+
+                Log.e("yes", "yess");
+
                 source.send(Json.to(new Client35()));
             }else {
+
                 alert("Cannot login");
                 finish();
             }
+        }, failStr->{
+            alert(failStr);
         });
 
     }
@@ -93,6 +102,8 @@ public class LoadActivity extends RootActivity implements LobbyBridge {
                 alert("Cannot login");
                 finish();
             }
+        }, fail->{
+
         });
     }
 
