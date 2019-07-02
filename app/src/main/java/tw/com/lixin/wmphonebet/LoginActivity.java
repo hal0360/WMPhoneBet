@@ -23,7 +23,7 @@ public class LoginActivity extends RootActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        popup = new Popup(this,R.layout.login_setting_pop,R.style.SettingCasDialog);
+        popup = new Popup(this,R.layout.login_setting_pop, R.style.SettingCasDialog);
         popup.setGravity(Gravity.TOP|Gravity.END);
         popup.clicked(R.id.english_btn,v -> {
             switchLocale(Locale.US);
@@ -59,11 +59,9 @@ public class LoginActivity extends RootActivity {
         });
 
         //   setTextView(R.id.table_txt, 4 + "");
-
         clicked(accountSwitch, v -> Setting.savePassword(accountSwitch.isChecked()));
 
         // setTextView(R.id.user_online_txt, 4 + "");
-
 
     }
 

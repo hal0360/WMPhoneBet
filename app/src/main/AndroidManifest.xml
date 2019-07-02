@@ -21,7 +21,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoadActivity" />
+        <activity
+            android:screenOrientation="portrait"
+            android:name=".LoadActivity" />
         <activity android:name=".LobbyActivity"></activity>
     </application>
 

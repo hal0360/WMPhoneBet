@@ -32,9 +32,8 @@ public class LoadActivity extends RootActivity implements LobbyBridge {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_load);
 
-
         source = LobbySource.getInstance();
-       // source.bind(this);
+
         loadings.put("loading1", R.drawable.loading1);
         loadings.put("loading2", R.drawable.loading2);
         loadings.put("loading3", R.drawable.loading3);
@@ -50,8 +49,8 @@ public class LoadActivity extends RootActivity implements LobbyBridge {
         loadings.put("loading11", R.drawable.loading11);
         loadings.put("loading12", R.drawable.loading12);
         loadings.put("loading13", R.drawable.loading13);
-        pass = getPassedStr();
 
+        pass = getPassedStr();
     }
 
     private void recurLoad(int loadI){
@@ -77,19 +76,23 @@ public class LoadActivity extends RootActivity implements LobbyBridge {
                 User.memberID(log.memberID);
                 User.sid(log.sid);
 
-
                 Log.e("yes", "yess");
 
                 source.send(Json.to(new Client35()));
             }else {
-
                 alert("Cannot login");
-                finish();
+                toActivity(LoginActivity.class);
             }
         }, failStr->{
             alert(failStr);
+            toActivity(LoginActivity.class);
         });
+    }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        source.unbind();
     }
 
     @Override
@@ -106,6 +109,7 @@ public class LoadActivity extends RootActivity implements LobbyBridge {
 
         });
     }
+
 
     @Override
     public void balanceUpdated() {
