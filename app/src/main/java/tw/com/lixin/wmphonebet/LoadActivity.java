@@ -21,10 +21,8 @@ import tw.com.lixin.wmphonebet.websocketSource.LobbySource;
 public class LoadActivity extends RootActivity implements LobbyBridge {
 
     private LobbySource source;
-
     private ImageView loadImg;
     private Map<String, Integer> loadings = new HashMap<>();
-
     private String pass;
 
     @Override
@@ -33,6 +31,7 @@ public class LoadActivity extends RootActivity implements LobbyBridge {
         setContentView(R.layout.activity_load);
 
         source = LobbySource.getInstance();
+
 
         loadings.put("loading1", R.drawable.loading1);
         loadings.put("loading2", R.drawable.loading2);
@@ -68,15 +67,16 @@ public class LoadActivity extends RootActivity implements LobbyBridge {
         loadImg = findViewById(R.id.load_img);
         recurLoad(1);
 
+        source.bind(this);
+
         source.login(User.account(), pass, log ->{
             if(log.bOk){
+
                 User.account(log.account);
                 User.gameID(log.gameID);
                 User.userName(log.userName);
                 User.memberID(log.memberID);
                 User.sid(log.sid);
-
-                Log.e("yes", "yess");
 
                 source.send(Json.to(new Client35()));
             }else {

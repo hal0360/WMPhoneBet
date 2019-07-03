@@ -9,6 +9,7 @@ import java.util.Locale;
 import tw.com.atromoby.widgets.CustomInput;
 import tw.com.atromoby.widgets.Popup;
 import tw.com.atromoby.widgets.RootActivity;
+import tw.com.lixin.wmphonebet.Tools.LoadDialog;
 import tw.com.lixin.wmphonebet.global.Setting;
 import tw.com.lixin.wmphonebet.global.User;
 
@@ -55,7 +56,9 @@ public class LoginActivity extends RootActivity {
         });
 
         clicked(R.id.setting_btn, v->{
-            popup.show();
+          //  popup.show();
+
+            new LoadDialog(this).show();
         });
 
         //   setTextView(R.id.table_txt, 4 + "");

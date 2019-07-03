@@ -15,7 +15,7 @@
         <item name="android:colorForeground">#42221f1f</item>
     </style>
 
-    <style name="SlidAnimation">
+    <style name="SliddAnimation">
         <item name="android:windowEnterAnimation">@anim/slide_in</item>
         <item name="android:windowExitAnimation">@anim/slide_out</item>
     </style>
@@ -23,7 +23,7 @@
     <style name="SettingCasDialog" parent="Theme.AppCompat.Light.Dialog">
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:backgroundDimAmount">0.0</item>
-        <item name="android:windowAnimationStyle">@style/SlidAnimation</item>
+        <item name="android:windowAnimationStyle">@style/SliddAnimation</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowFullscreen">true</item>
@@ -32,5 +32,15 @@
         <item name="android:windowCloseOnTouchOutside">true</item>
     </style>
 
+    <style name="LoadDialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.5</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowCloseOnTouchOutside">false</item>
+    </style>
 
 </resources>

@@ -13,6 +13,7 @@ import tw.com.atromoby.utils.Cmd;
 import tw.com.atromoby.utils.Json;
 import tw.com.lixin.wmphonebet.interfaces.CmdLog;
 import tw.com.lixin.wmphonebet.interfaces.CmdStr;
+import tw.com.lixin.wmphonebet.jsonData.CheckData;
 import tw.com.lixin.wmphonebet.jsonData.LoginData;
 import tw.com.lixin.wmphonebet.jsonData.LoginResData;
 
@@ -33,6 +34,24 @@ public abstract class CasinoSource extends WebSocketListener{
         public void onOpen(WebSocket webSocket, Response response) {
             send(loginDataStr);
         }
+
+    public final void login(String sid, CmdLog logOK, CmdStr logFail){
+        cmdLogOpen = logOK;
+        cmdLogFail = logFail;
+        logHandler.postDelayed(()-> {
+            close();
+            cmdLogOpen = null;
+            if(cmdLogFail != null){
+                cmdLogFail.exec("Websocket login timeout");
+                cmdLogFail = null;
+            }
+        },6000);
+        loginDataStr = Json.to(new CheckData(sid));
+        close();
+        OkHttpClient client = new OkHttpClient();
+        webSocket = client.newWebSocket(new Request.Builder().url(webUrl).build(), this);
+        client.dispatcher().executorService().shutdown();
+    }
 
         public final void login(String user, String pass, CmdLog logOK, CmdStr logFail){
             cmdLogOpen = logOK;
