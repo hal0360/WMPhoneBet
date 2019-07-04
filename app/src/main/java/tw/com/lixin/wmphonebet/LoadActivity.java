@@ -32,7 +32,6 @@ public class LoadActivity extends RootActivity implements LobbyBridge {
 
         source = LobbySource.getInstance();
 
-
         loadings.put("loading1", R.drawable.loading1);
         loadings.put("loading2", R.drawable.loading2);
         loadings.put("loading3", R.drawable.loading3);
@@ -68,7 +67,6 @@ public class LoadActivity extends RootActivity implements LobbyBridge {
         recurLoad(1);
 
         source.bind(this);
-
         source.login(User.account(), pass, log ->{
             if(log.bOk){
 
@@ -98,12 +96,12 @@ public class LoadActivity extends RootActivity implements LobbyBridge {
     @Override
     public void wholeDataUpdated() {
         BacSource bacSource  = BacSource.getInstance();
-        bacSource.login(User.userName(), pass,log->{
+        bacSource.login(User.sid(),log->{
             if(log.bOk){
                 toActivity(LobbyActivity.class);
             }else {
                 alert("Cannot login");
-                finish();
+               // finish();
             }
         }, fail->{
 

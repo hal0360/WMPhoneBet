@@ -12,8 +12,9 @@ import tw.com.atromoby.widgets.RootActivity;
 import tw.com.lixin.wmphonebet.Tools.LoadDialog;
 import tw.com.lixin.wmphonebet.global.Setting;
 import tw.com.lixin.wmphonebet.global.User;
+import tw.com.lixin.wmphonebet.websocketSource.LobbySource;
 
-public class LoginActivity extends RootActivity {
+public class LoginActivity extends RootActivity{
 
     private CustomInput userIn, passIn;
     private SwitchCompat accountSwitch;

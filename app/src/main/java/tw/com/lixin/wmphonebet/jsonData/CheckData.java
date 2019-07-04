@@ -9,6 +9,7 @@ public class CheckData {
         data.sid = sid;
     }
 
+
     private class Data{
         String sid = "";
     }
