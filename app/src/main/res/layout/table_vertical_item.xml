@@ -8,7 +8,7 @@
     android:id="@+id/table_grid"
     android:background="@drawable/modal_road_blank">
 
-    <tw.com.lixin.wmcasino.Tools.CasinoGrid
+    <tw.com.lixin.wmphonebet.Tools.CasinoGrid
         android:id="@+id/road_grid"
         android:layout_width="0dp"
         android:layout_height="0dp"

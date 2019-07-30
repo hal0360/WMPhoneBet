@@ -10,7 +10,9 @@ import tw.com.atromoby.widgets.RootActivity;
 import tw.com.lixin.wmphonebet.BacActivity;
 import tw.com.lixin.wmphonebet.R;
 import tw.com.lixin.wmphonebet.Tools.CasinoGrid;
+import tw.com.lixin.wmphonebet.WMActivity;
 import tw.com.lixin.wmphonebet.websocketSource.BacSource;
+import tw.com.lixin.wmphonebet.websocketSource.LobbySource;
 
 
 public class TableHolder extends ItemHolder {
@@ -35,23 +37,21 @@ public class TableHolder extends ItemHolder {
 
         grid.drawRoad(table.firstGrid);
 
-
         clicked(R.id.table_grid,v->{
-tableLog();
+            WMActivity activity = (WMActivity) getContex();
+            BacSource source = BacSource.getInstance();
+            source.tableLogin(table,ok->{
+                if(ok){
+                    Kit.alert(activity,"Cannot go to this table ok");
+                    activity.toActivity(BacActivity.class);
+
+                }else{
+                    Kit.alert(activity,"Cannot go to this table ");
+                }
+            });
+
         });
 
-    }
-
-    private void tableLog(){
-        BacSource source = BacSource.getInstance();
-        source.tableLogin(table, ok->{
-            if(ok){
-                RootActivity rootActivity = (RootActivity) getContex();
-                rootActivity.pushActivity(BacActivity.class);
-            }else{
-                Kit.alert(getContex(),"Cannot login to table");
-            }
-        });
     }
 
     @Override

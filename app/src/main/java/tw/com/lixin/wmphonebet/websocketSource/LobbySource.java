@@ -26,11 +26,12 @@ public class LobbySource extends CasinoSource{
 
     private LobbySource() {
         tables = new ArrayList<>();
-        defineURL(Url.Lobby);
+        defineURL("ws://gameserver.a45.me:15109");
     }
 
     private LobbyBridge bridge;
     public List<Table> tables;
+    public int pplOnline;
 
     public void bind(LobbyBridge bridge){
         this.bridge = bridge;
@@ -62,7 +63,7 @@ public class LobbySource extends CasinoSource{
             case 35:
                 Game bacGame = null;
                 for(Game game: lobbyData.data.gameArr){
-                    if (game.gameID == 301)
+                    if (game.gameID == 101)
                         bacGame = game;
                 }
                 if(bacGame == null) return;
@@ -86,7 +87,15 @@ public class LobbySource extends CasinoSource{
                 handle(() -> bridge.balanceUpdated());
                 break;
             case 34:
-                handle(() -> bridge.peopleOnlineUpdate(lobbyData.data.onlinePeople));
+
+                if(lobbyData.data.gameID == 101){
+                    pplOnline = lobbyData.data.onlinePeople;
+
+
+
+                    handle(() -> bridge.peopleOnlineUpdate(lobbyData.data.onlinePeople));
+                }
+
                 break;
             default:
         }

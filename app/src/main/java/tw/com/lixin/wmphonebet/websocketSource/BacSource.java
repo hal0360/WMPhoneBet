@@ -29,7 +29,7 @@ public class BacSource extends CasinoSource{
         return single_instance;
     }
     private BacSource() {
-        defineURL(Url.Bac);
+        defineURL("ws://gameserver.a45.me:15101");
     }
 
     private BacBridge bridge;

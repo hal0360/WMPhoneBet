@@ -6,26 +6,32 @@ import android.view.Gravity;
 
 import java.util.Locale;
 
+import tw.com.atromoby.utils.Json;
 import tw.com.atromoby.widgets.CustomInput;
 import tw.com.atromoby.widgets.Popup;
 import tw.com.atromoby.widgets.RootActivity;
 import tw.com.lixin.wmphonebet.Tools.LoadDialog;
 import tw.com.lixin.wmphonebet.global.Setting;
 import tw.com.lixin.wmphonebet.global.User;
+import tw.com.lixin.wmphonebet.interfaces.LobbyBridge;
+import tw.com.lixin.wmphonebet.jsonData.Client35;
 import tw.com.lixin.wmphonebet.websocketSource.LobbySource;
 
-public class LoginActivity extends RootActivity{
+public class LoginActivity extends WMActivity implements LobbyBridge {
 
     private CustomInput userIn, passIn;
     private SwitchCompat accountSwitch;
     private Popup popup;
+    private LobbySource source;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        popup = new Popup(this,R.layout.login_setting_pop, R.style.SettingCasDialog);
+        source = LobbySource.getInstance();
+
+        popup = new Popup(this,R.layout.login_setting_pop,R.style.SettingCasDialog);
         popup.setGravity(Gravity.TOP|Gravity.END);
         popup.clicked(R.id.english_btn,v -> {
             switchLocale(Locale.US);
@@ -38,41 +44,116 @@ public class LoginActivity extends RootActivity{
 
         userIn = findViewById(R.id.userInput);
         passIn = findViewById(R.id.passInput);
-
         accountSwitch = findViewById(R.id.accountSwitch);
         accountSwitch.setChecked(Setting.savePassword());
-        if(Setting.savePassword()) passIn.setText(Setting.remPass());
+        if(Setting.savePassword()) userIn.setText(User.userName());
 
         clicked(R.id.loginBtn,v ->{
-            String user = userIn.getRawText();
-            String pass = passIn.getRawText();
-            if(Setting.savePassword()) Setting.remPass(pass);
-            User.account(user);
-            toActivity(LoadActivity.class, pass);
+            User.userName(userIn.getRawText());
+            User.account(userIn.getRawText());
+            loading();
+            source.login(userIn.getRawText(),passIn.getRawText(),data->{
+                User.account(data.account);
+                User.gameID(data.gameID);
+                User.userName(data.userName);
+                User.memberID(data.memberID);
+                User.sid(data.sid);
+                toActivity(LobbyActivity.class);
+            }, fail->{
+                unloading();
+                alert(fail);
+                recreate();
+            });
+
+            // toActivity(LoadActivity.class, pass);
         });
 
         clicked(R.id.questBtn, v->{
+           //source.unbind();
             User.account("ANONYMOUS");
-            toActivity(LoadActivity.class, "1234");
+            User.userName("ANONYMOUS");
+            loading();
+            source.login("ANONYMOUS","1234",data->{
+                unloading();
+                User.account(data.account);
+                User.gameID(data.gameID);
+                User.userName(data.userName);
+                User.memberID(data.memberID);
+                User.sid(data.sid);
+                toActivity(LobbyActivity.class);
+            }, fail->{
+                unloading();
+                alert(fail);
+            });
         });
 
         clicked(R.id.setting_btn, v->{
-          //  popup.show();
+            // popup.show();
 
-            new LoadDialog(this).show();
+            source.bind(this);
         });
 
-        //   setTextView(R.id.table_txt, 4 + "");
+        if(!isPortrait()){
+            setTextView(R.id.table_txt, source.tables.size()+"");
+        }
+
         clicked(accountSwitch, v -> Setting.savePassword(accountSwitch.isChecked()));
 
-        // setTextView(R.id.user_online_txt, 4 + "");
+        if(!isPortrait()){
+            setTextView(R.id.user_online_txt, source.pplOnline+"");
+        }
 
     }
 
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        source.bind(this);
+        if(source.isConnected()) return;
+        loading();
+        source.login("ANONYMOUS","1234",data->{
+            User.account(data.account);
+            User.gameID(data.gameID);
+            User.userName(data.userName);
+            User.memberID(data.memberID);
+            User.sid(data.sid);
+            source.send(Json.to(new Client35()));
+        }, fail->{
+            alert(fail);
+            unloading();
+        });
+
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        source.unbind();
+    }
+
+
+    @Override
+    public void wholeDataUpdated() {
+        unloading();
+        alert(source.tables.size()+"");
+        if(!isPortrait()){
+            setTextView(R.id.table_txt, source.tables.size()+"");
+        }
+    }
+
+    @Override
+    public void balanceUpdated() {
+
+    }
+
+    @Override
+    public void peopleOnlineUpdate(int number) {
+        if(!isPortrait()){
+            setTextView(R.id.user_online_txt, number+"");
+        }
     }
 }

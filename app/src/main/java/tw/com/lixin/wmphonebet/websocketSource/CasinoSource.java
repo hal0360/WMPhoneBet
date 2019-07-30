@@ -19,23 +19,40 @@ import tw.com.lixin.wmphonebet.jsonData.LoginResData;
 
 public abstract class CasinoSource extends WebSocketListener{
 
-        private WebSocket webSocket = null;
-        private Handler genHandler = new Handler();
+    private WebSocket webSocket = null;
+    private Handler genHandler = new Handler();
 
-        private Handler logHandler = new Handler();
+    private Handler logHandler = new Handler();
 
-        private boolean connected = false;
-        private String loginDataStr;
-        private String webUrl;
-        private CmdLog cmdLogOpen;
-        private CmdStr cmdLogFail;
+    private boolean connected = false;
+    private String loginDataStr;
+    private String webUrl;
+    private CmdLog cmdLogOpen;
+    private CmdStr cmdLogFail;
 
-        @Override
-        public void onOpen(WebSocket webSocket, Response response) {
-            send(loginDataStr);
-        }
+    @Override
+    public void onOpen(WebSocket webSocket, Response response) {
+        send(loginDataStr);
+    }
+
+    public final void login(String user, String pass, CmdLog logOK, CmdStr logFail){
+        close();
+        cmdLogOpen = logOK;
+        cmdLogFail = logFail;
+        logHandler.postDelayed(()-> {
+            if(cmdLogFail != null) genHandler.post(() -> {
+                cmdLogFail.exec("Websocket login timeout");
+            });
+            close();
+        },6000);
+        loginDataStr = Json.to(new LoginData( user, pass));
+        OkHttpClient client = new OkHttpClient();
+        webSocket = client.newWebSocket(new Request.Builder().url(webUrl).build(), this);
+        client.dispatcher().executorService().shutdown();
+    }
 
     public final void login(String sid, CmdLog logOK, CmdStr logFail){
+        close();
         cmdLogOpen = logOK;
         cmdLogFail = logFail;
         logHandler.postDelayed(()-> {
@@ -47,33 +64,15 @@ public abstract class CasinoSource extends WebSocketListener{
             }
         },6000);
         loginDataStr = Json.to(new CheckData(sid));
-        close();
         OkHttpClient client = new OkHttpClient();
         webSocket = client.newWebSocket(new Request.Builder().url(webUrl).build(), this);
         client.dispatcher().executorService().shutdown();
     }
 
-        public final void login(String user, String pass, CmdLog logOK, CmdStr logFail){
-            cmdLogOpen = logOK;
-            cmdLogFail = logFail;
-            logHandler.postDelayed(()-> {
-                close();
-                cmdLogOpen = null;
-                if(cmdLogFail != null){
-                    cmdLogFail.exec("Websocket login timeout");
-                    cmdLogFail = null;
-                }
-            },6000);
-            loginDataStr = Json.to(new LoginData( user, pass));
-            close();
-            OkHttpClient client = new OkHttpClient();
-            webSocket = client.newWebSocket(new Request.Builder().url(webUrl).build(), this);
-            client.dispatcher().executorService().shutdown();
-        }
 
-        public void defineURL(String url){
-            webUrl = url;
-        }
+    public void defineURL(String url){
+        webUrl = url;
+    }
 
     public boolean isConnected() {
         return connected;
@@ -82,83 +81,82 @@ public abstract class CasinoSource extends WebSocketListener{
     public abstract void onReceive(String text);
 
 
-        @Override
-        public void onMessage(WebSocket webSocket, String text) {
+    @Override
+    public void onMessage(WebSocket webSocket, String text) {
 
-            Log.e("webSocket", text);
+        Log.e("webSocket", text);
 
-            if(!connected){
-                LoginResData logRespend = Json.from(text, LoginResData.class);
-                if(logRespend.protocol == 0){
-                    logHandler.removeCallbacksAndMessages(null);
-                    if(logRespend.data.bOk) connected = true;
+        if(!connected){
+            LoginResData logRespend = Json.from(text, LoginResData.class);
+            if(logRespend.protocol == 0){
+                logHandler.removeCallbacksAndMessages(null);
+                if(logRespend.data.bOk){
+                    connected = true;
                     cmdLogFail = null;
                     if(cmdLogOpen != null) genHandler.post(() -> {
-                       // Log.e("webSocket", "hjhjhjhj");
                         cmdLogOpen.exec(logRespend.data);
                         cmdLogOpen = null;
                     });
-
+                }else{
+                    if(cmdLogFail != null) genHandler.post(() -> {
+                        cmdLogFail.exec("Password incorrect!!");
+                    });
+                    close();
                 }
-            }else {
-                onReceive(text);
             }
-
+        }else {
+            onReceive(text);
         }
+    }
 
-        public void handlePost(Cmd cmd){
-            genHandler.post(cmd::exec);
-        }
+    public void handlePost(Cmd cmd){
+        genHandler.post(cmd::exec);
+    }
 
-        public void send(String message){
-            webSocket.send(message);
-        }
+    public void send(String message){
+        webSocket.send(message);
+    }
 
-        public void close(){
-            Log.e("onclose", "caleed");
-            if(webSocket == null) return;
-            webSocket.close(1000,null);
-            webSocket = null;
-            cleanCallbacks();
-        }
+    public void close(){
+        Log.e("onclose", "caleed");
+        connected = false;
+        cleanCallbacks();
+        if(webSocket == null) return;
+        webSocket.close(1000,null);
+        webSocket = null;
+    }
 
-        @Override
-        public void onMessage(WebSocket webSocket, ByteString bytes) {
-            //   Log.e("onMessageByte", bytes.toString());
-        }
+    @Override
+    public void onMessage(WebSocket webSocket, ByteString bytes) {
+        //   Log.e("onMessageByte", bytes.toString());
+    }
 
-        @Override
-        public void onClosing(WebSocket webSocket, int code, String reason) {
-            Log.e("onClosing", "bye bye");
-            //webSocket.close(1000, null);
-            connected = false;
-        }
+    @Override
+    public void onClosing(WebSocket webSocket, int code, String reason) {
+        Log.e("onClosing", "bye bye");
+        //webSocket.close(1000, null);
+        connected = false;
+    }
 
-        @Override
-        public void onClosed(WebSocket webSocket, int code, String reason) {
-            Log.e("onClosing", "god bye");
-            connected = false;
-        }
+    @Override
+    public void onClosed(WebSocket webSocket, int code, String reason) {
+        Log.e("onClosing", "god bye");
+        connected = false;
+    }
 
-        @Override
-        public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-            Log.e("failed", t.toString());
-            cmdLogOpen = null;
-            logHandler.post(()-> {
-                if(cmdLogFail != null){
-                    cmdLogFail.exec(t.toString());
-                    cmdLogFail = null;
-                }
-            });
-            if(cmdLogFail != null) cmdLogFail.exec("Websocket login timeout");
-            this.webSocket = null;
+    @Override
+    public void onFailure(WebSocket webSocket, Throwable t, Response response) {
+        Log.e("failed", t.toString());
+        if(cmdLogFail != null)genHandler.post(() -> {
+            cmdLogFail.exec(t.toString());
+        });
+        close();
+    }
 
-        }
-
-        public void cleanCallbacks(){
-            cmdLogOpen = null;
-            cmdLogFail = null;
-            genHandler.removeCallbacksAndMessages(null);
-            logHandler.removeCallbacksAndMessages(null);
-        }
+    public void cleanCallbacks(){
+        cmdLogOpen = null;
+        cmdLogFail = null;
+        genHandler.removeCallbacksAndMessages(null);
+        logHandler.removeCallbacksAndMessages(null);
+    }
 }

@@ -8,10 +8,10 @@ import java.util.Locale;
 
 import tw.com.atromoby.utils.Kit;
 import tw.com.atromoby.widgets.ItemHolder;
-import tw.com.atromoby.widgets.RootActivity;
 import tw.com.lixin.wmphonebet.BacActivity;
 import tw.com.lixin.wmphonebet.R;
 import tw.com.lixin.wmphonebet.Tools.CasinoGrid;
+import tw.com.lixin.wmphonebet.WMActivity;
 import tw.com.lixin.wmphonebet.websocketSource.BacSource;
 
 
@@ -26,7 +26,6 @@ public class VerticalTableHolder extends ItemHolder {
 
     @Override
     public void onBind() {
-
         CasinoGrid grid = findViewById(R.id.road_grid);
 
         grid.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -39,10 +38,9 @@ public class VerticalTableHolder extends ItemHolder {
                 int wGrid = (int) Math.round(grid.getWidth()/dim);
                 grid.setGrid(wGrid, 6);
                 grid.drawRoad(table.firstGrid);
+
             }
         });
-
-
 
         TextView gyuTxt = findViewById(R.id.gyu_shu);
         gyuTxt.setText(getContex().getString(R.string.table_number) + "  " + table.number + " -- " + table.round);
@@ -51,21 +49,23 @@ public class VerticalTableHolder extends ItemHolder {
 
 
         clicked(R.id.table_grid,v->{
-            tableLog();
+            WMActivity activity = (WMActivity) getContex();
+            BacSource source = BacSource.getInstance();
+
+            Kit.alert(activity,"gsgscc");
+            source.tableLogin(table,ok->{
+                if(ok){
+                    Kit.alert(activity,"Cannot go to this table ok");
+                    activity.toActivity(BacActivity.class);
+
+                }else{
+                    Kit.alert(activity,"Cannot go to this table ");
+                }
+            });
+
+
         });
 
-    }
-
-    private void tableLog(){
-        BacSource source = BacSource.getInstance();
-        source.tableLogin(table, ok->{
-            if(ok){
-                RootActivity rootActivity = (RootActivity) getContex();
-                rootActivity.pushActivity(BacActivity.class);
-            }else{
-                Kit.alert(getContex(),"Cannot login to table");
-            }
-        });
     }
 
 

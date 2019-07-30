@@ -31,7 +31,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/table_img">
 
-        <tw.com.lixin.wmcasino.Tools.CasinoGrid
+        <tw.com.lixin.wmphonebet.Tools.CasinoGrid
             android:id="@+id/road_grid"
             android:layout_width="375dp"
             android:layout_height="79dp"
@@ -45,9 +45,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.43"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-        </tw.com.lixin.wmcasino.Tools.CasinoGrid >
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/table_num"

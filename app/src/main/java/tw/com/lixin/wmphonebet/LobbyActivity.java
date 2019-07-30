@@ -20,7 +20,7 @@ import tw.com.lixin.wmphonebet.models.VerticalEmptyHolder;
 import tw.com.lixin.wmphonebet.models.VerticalTableHolder;
 import tw.com.lixin.wmphonebet.websocketSource.LobbySource;
 
-public class LobbyActivity extends RootActivity implements LobbyBridge {
+public class LobbyActivity extends WMActivity implements LobbyBridge {
 
     ItemsView itemsView;
     LobbySource source;
@@ -31,9 +31,8 @@ public class LobbyActivity extends RootActivity implements LobbyBridge {
         setContentView(R.layout.activity_lobby);
 
         source = LobbySource.getInstance();
+
         setTextView(R.id.member_txt, User.account());
-        // setTextView(R.id.member_txt, "\u5e84:\u2666K\u26663\u26662\u95f2:\u2665K\u26633\u2660J");
-        int orientation = getResources().getConfiguration().orientation;
 
         clicked(R.id.setting_icon, v->{
             new SettingPopup(this).show();
@@ -41,46 +40,92 @@ public class LobbyActivity extends RootActivity implements LobbyBridge {
 
         itemsView = findViewById(R.id.itemsView);
         List<ItemHolder> holders = new ArrayList<>();
+
+
         for(Table table: source.tables){
-            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if (!isPortrait()) {
                 holders.add(new TableHolder(table));
             } else {
                 holders.add(new VerticalTableHolder(table));
             }
         }
-
         int tRem = 10 - source.tables.size();
         if(tRem > 0){
             for (int g = 0; g<tRem;g++){
-                if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                if (!isPortrait()) {
                     holders.add(new EmptyHolder());
                 } else {
                     holders.add(new VerticalEmptyHolder());
                 }
             }
         }
-
         itemsView.add(holders);
 
         setTextView(R.id.table_txt, source.tables.size() + "");
-
     }
 
     @Override
     public void onResume(){
         super.onResume();
-        // put your code here...
 
-        if(!source.isConnected()){
+        source.bind(this);
+        if(source.isConnected()) return;
+        loading();
+        source.login(User.sid(),data->{
+            unloading();
+            alert("reconnected");
+        }, fail->{
+            source.close();
+            toActivity(LoginActivity.class);
+            alert(fail);
+            unloading();
+        });
+
+        /*
+        if(!App.socket.connected){
+            App.logout();
             toActivity(LoginActivity.class);
         }
 
+        App.socket.receive26(data->  {
+            itemsView.refresh();
+        });
+
+        App.socket.receive34(data->  {
+            setTextView(R.id.user_online_txt, data.onlinePeople + "");
+        });
+
+        App.socket.receive10(data -> {
+            if (data.bOk) {
+
+               // App.cleanSocketCalls();
+
+                App.group.data10 = data;
+                App.group.areaID = data.areaID;
+                App.group.groupID = App.groupID;
+
+                pushActivity(CasinoActivity.class);
+
+            } else alert("Cannot login to this table");
+        });
+
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setTextView(R.id.player_money, User.balance() + "");
+        }*/
 
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        source.unbind();
+    }
+
+
+    @Override
     public void onBackPressed() {
-        App.logout();
+        //   App.logout();
         super.onBackPressed();
     }
 
@@ -91,14 +136,11 @@ public class LobbyActivity extends RootActivity implements LobbyBridge {
 
     @Override
     public void balanceUpdated() {
-        int orientation = getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            setTextView(R.id.player_money, User.balance() + "");
-        }
+
     }
 
     @Override
     public void peopleOnlineUpdate(int number) {
-
+        setTextView(R.id.user_online_txt, number + "");
     }
 }
