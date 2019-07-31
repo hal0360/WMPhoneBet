@@ -1,6 +1,7 @@
 package tw.com.lixin.wmphonebet.websocketSource;
 
 import android.content.Context;
+import android.util.Log;
 import android.util.SparseIntArray;
 import android.widget.TextView;
 
@@ -67,8 +68,9 @@ public class BacSource extends CasinoSource{
     }
 
     public void handle(Cmd cmd){
-        if(bridge == null) return;
-        super.handlePost(cmd);
+        super.handle(() ->{
+            if(bridge != null) cmd.exec();
+        });
     }
 
     public void tableLogin(Table table, CmdBool cmd){
@@ -81,6 +83,7 @@ public class BacSource extends CasinoSource{
 
     @Override
     public void onReceive(String text) {
+        Log.e("bacSocket", text);
         BacData bacData = Json.from(text, BacData.class);
         if(bacData.data.gameID != gameID || bacData.data.groupID != groupID) return;
         if(bacData.protocol == 10){
@@ -108,7 +111,7 @@ public class BacSource extends CasinoSource{
                 if(maxBetVal < bacData.data.maxBet03) maxBetVal = bacData.data.maxBet03;
                 if(maxBetVal < bacData.data.maxBet04) maxBetVal = bacData.data.maxBet04;
             }
-            if(cOk != null) handlePost(()-> {
+            if(cOk != null) super.handle(()-> {
                 cOk.exec(bacData.data.bOk);
                 cOk = null;
             });

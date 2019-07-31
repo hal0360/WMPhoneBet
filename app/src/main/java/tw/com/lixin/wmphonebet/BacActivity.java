@@ -92,7 +92,7 @@ public class BacActivity extends RootActivity implements BacBridge {
         fadeAnimeB = AnimationUtils.loadAnimation(this, R.anim.prediction_fade);
         source.bind(this);
 
-        String path = "rtmp://wmvdo.c2h6.cn/ytb" + String.format(Locale.US, "%02d", source.groupID) + "-1/stream1";
+        String path = "rtmp://wmvdo.nicejj.cn/live" + source.groupID + "/stream1";
         video = findViewById(R.id.player);
         video.setVideoPath(path);
         video.start();

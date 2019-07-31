@@ -18,6 +18,7 @@ import tw.com.lixin.wmphonebet.models.Table;
 import tw.com.lixin.wmphonebet.models.TableHolder;
 import tw.com.lixin.wmphonebet.models.VerticalEmptyHolder;
 import tw.com.lixin.wmphonebet.models.VerticalTableHolder;
+import tw.com.lixin.wmphonebet.websocketSource.BacSource;
 import tw.com.lixin.wmphonebet.websocketSource.LobbySource;
 
 public class LobbyActivity extends WMActivity implements LobbyBridge {
@@ -49,6 +50,8 @@ public class LobbyActivity extends WMActivity implements LobbyBridge {
                 holders.add(new VerticalTableHolder(table));
             }
         }
+
+        /*
         int tRem = 10 - source.tables.size();
         if(tRem > 0){
             for (int g = 0; g<tRem;g++){
@@ -58,15 +61,32 @@ public class LobbyActivity extends WMActivity implements LobbyBridge {
                     holders.add(new VerticalEmptyHolder());
                 }
             }
-        }
+        }*/
         itemsView.add(holders);
-
         setTextView(R.id.table_txt, source.tables.size() + "");
+        setTextView(R.id.table_txt, source.tables.size() + "");
+        if (!isPortrait()) setTextView(R.id.player_money, User.balance() + "");
     }
 
     @Override
     public void onResume(){
         super.onResume();
+
+        BacSource bacSource = BacSource.getInstance();
+        if(!bacSource.isConnected()) {
+            loading();
+            bacSource.login(User.sid(),data->{
+                unloading();
+                alert("bac reconnected");
+            }, fail->{
+                bacSource.close();
+                toActivity(LoginActivity.class);
+                alert(fail);
+                unloading();
+            });
+        }
+
+
 
         source.bind(this);
         if(source.isConnected()) return;
@@ -136,7 +156,7 @@ public class LobbyActivity extends WMActivity implements LobbyBridge {
 
     @Override
     public void balanceUpdated() {
-
+        if (!isPortrait()) setTextView(R.id.player_money, User.balance() + "");
     }
 
     @Override

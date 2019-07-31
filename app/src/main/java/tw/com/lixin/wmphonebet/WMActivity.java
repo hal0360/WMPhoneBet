@@ -35,9 +35,6 @@ public abstract class WMActivity extends RootActivity {
         loadDialog.dismiss();
     }
 
-    public boolean isPortrait(){
-        return getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE;
-    }
 
     public int orientation(){
         return getResources().getConfiguration().orientation;

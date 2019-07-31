@@ -109,7 +109,7 @@ public abstract class CasinoSource extends WebSocketListener{
         }
     }
 
-    public void handlePost(Cmd cmd){
+    public void handle(Cmd cmd){
         genHandler.post(cmd::exec);
     }
 

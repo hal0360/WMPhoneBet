@@ -1,5 +1,6 @@
 package tw.com.lixin.wmphonebet.websocketSource;
 
+import android.os.Handler;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -18,6 +19,8 @@ import tw.com.lixin.wmphonebet.models.Table;
 public class LobbySource extends CasinoSource{
 
     private static LobbySource single_instance = null;
+
+
     public static LobbySource getInstance()
     {
         if (single_instance == null) single_instance = new LobbySource();
@@ -41,11 +44,6 @@ public class LobbySource extends CasinoSource{
         this.bridge = null;
     }
 
-    public void handle(Cmd cmd){
-        if(bridge == null) return;
-        super.handlePost(cmd);
-    }
-
     public Table findTable(int id){
         for(Table tt: tables){
             if(tt.groupID == id){
@@ -53,6 +51,12 @@ public class LobbySource extends CasinoSource{
             }
         }
         return null;
+    }
+
+    public void handle(Cmd cmd){
+        super.handle(() ->{
+            if(bridge != null) cmd.exec();
+        });
     }
 
     @Override
@@ -90,9 +94,6 @@ public class LobbySource extends CasinoSource{
 
                 if(lobbyData.data.gameID == 101){
                     pplOnline = lobbyData.data.onlinePeople;
-
-
-
                     handle(() -> bridge.peopleOnlineUpdate(lobbyData.data.onlinePeople));
                 }
 

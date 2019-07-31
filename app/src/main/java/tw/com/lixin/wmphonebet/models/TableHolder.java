@@ -42,7 +42,7 @@ public class TableHolder extends ItemHolder {
             BacSource source = BacSource.getInstance();
             source.tableLogin(table,ok->{
                 if(ok){
-                    Kit.alert(activity,"Cannot go to this table ok");
+
                     activity.toActivity(BacActivity.class);
 
                 }else{
