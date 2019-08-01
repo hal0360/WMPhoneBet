@@ -529,7 +529,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView" />
 
-                <tw.com.lixin.wmcasino.Tools.CoinStack
+                <tw.com.lixin.wmphonebet.Tools.CoinStack
                     android:id="@+id/table_left_stack"
                     android:layout_width="0dp"
                     android:layout_height="50dp"
@@ -573,7 +573,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView9" />
 
-                <tw.com.lixin.wmcasino.Tools.CoinStack
+                <tw.com.lixin.wmphonebet.Tools.CoinStack
                     android:id="@+id/table_right_stack"
                     android:layout_width="0dp"
                     android:layout_height="50dp"
@@ -623,7 +623,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView7" />
 
-                <tw.com.lixin.wmcasino.Tools.CoinStack
+                <tw.com.lixin.wmphonebet.Tools.CoinStack
                     android:id="@+id/table_top_stack"
                     android:layout_width="0dp"
                     android:layout_height="50dp"
@@ -682,7 +682,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
-                <tw.com.lixin.wmcasino.Tools.CoinStack
+                <tw.com.lixin.wmphonebet.Tools.CoinStack
                     android:id="@+id/table_bt_l_stack"
                     android:layout_width="0dp"
                     android:layout_height="50dp"
@@ -732,7 +732,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView13" />
 
-                <tw.com.lixin.wmcasino.Tools.CoinStack
+                <tw.com.lixin.wmphonebet.Tools.CoinStack
                     android:id="@+id/table_bt_r_stack"
                     android:layout_width="0dp"
                     android:layout_height="50dp"
@@ -778,7 +778,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView556" />
 
-                <tw.com.lixin.wmcasino.Tools.CoinStack
+                <tw.com.lixin.wmphonebet.Tools.CoinStack
                     android:id="@+id/table_bt_super_stack"
                     android:layout_width="0dp"
                     android:layout_height="50dp"
@@ -791,7 +791,7 @@
 
         </android.support.constraint.ConstraintLayout>
 
-        <tw.com.lixin.wmcasino.Tools.GoldenButton
+        <tw.com.lixin.wmphonebet.Tools.GoldenButton
             android:id="@+id/cancel_bet_btn"
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -817,7 +817,7 @@
             app:layout_constraintEnd_toStartOf="@+id/scroll_right_btn"
             app:layout_constraintStart_toEndOf="@+id/scroll_left_btn" />
 
-        <tw.com.lixin.wmcasino.Tools.GoldenButton
+        <tw.com.lixin.wmphonebet.Tools.GoldenButton
             android:id="@+id/confirm_bet_btn"
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -828,7 +828,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/casino_item_btn_submit" />
 
-        <tw.com.lixin.wmcasino.Tools.GoldenButton
+        <tw.com.lixin.wmphonebet.Tools.GoldenButton
             android:id="@+id/repeat_bet_btn"
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -839,7 +839,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/casino_item_btn_repeat" />
 
-        <tw.com.lixin.wmcasino.Tools.GoldenButton
+        <tw.com.lixin.wmphonebet.Tools.GoldenButton
             android:id="@+id/comission_btn"
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -886,7 +886,7 @@
         app:layout_constraintStart_toEndOf="@+id/constraintLayout3"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
-    <tw.com.lixin.wmcasino.Tools.CasinoGrid
+    <tw.com.lixin.wmphonebet.Tools.CasinoGrid
         android:id="@+id/main_grid"
         android:layout_width="130dp"
         android:layout_height="0dp"
@@ -927,7 +927,7 @@
         app:layout_constraintStart_toEndOf="@+id/frameLayout13"
         app:layout_constraintTop_toBottomOf="@+id/frameLayout15" />
 
-    <tw.com.lixin.wmcasino.Tools.CasinoGrid
+    <tw.com.lixin.wmphonebet.Tools.CasinoGrid
         android:divider="@drawable/table_divider"
         android:showDividers="middle"
         android:id="@+id/first_grid"
@@ -939,7 +939,7 @@
         app:layout_constraintStart_toEndOf="@+id/constraintLayout3"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout"/>
 
-    <tw.com.lixin.wmcasino.Tools.CasinoGrid
+    <tw.com.lixin.wmphonebet.Tools.CasinoGrid
         android:divider="@drawable/table_divider"
         android:showDividers="middle"
         android:id="@+id/second_grid"
@@ -951,7 +951,7 @@
         app:layout_constraintStart_toEndOf="@+id/frameLayout13"
         app:layout_constraintTop_toBottomOf="@+id/frameLayout12"/>
 
-    <tw.com.lixin.wmcasino.Tools.CasinoGrid
+    <tw.com.lixin.wmphonebet.Tools.CasinoGrid
         android:divider="@drawable/table_divider"
         android:showDividers="middle"
         android:id="@+id/third_grid"
@@ -963,7 +963,7 @@
         app:layout_constraintStart_toEndOf="@+id/frameLayout13"
         app:layout_constraintTop_toBottomOf="@+id/frameLayout15"/>
 
-    <tw.com.lixin.wmcasino.Tools.CasinoGrid
+    <tw.com.lixin.wmphonebet.Tools.CasinoGrid
         android:divider="@drawable/table_divider"
         android:showDividers="middle"
         android:id="@+id/fourth_grid"

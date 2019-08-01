@@ -31,14 +31,17 @@ public class BacSource extends CasinoSource{
     }
     private BacSource() {
         defineURL("ws://gameserver.a45.me:15101");
+        countDownTimer = new CountDown();
     }
 
     private BacBridge bridge;
     public boolean comission = false;
-    public boolean cardIsOpening = true;
+    public boolean cardIsOpening = false;
     public boolean isBettingNow = true;
+
+
     public int groupID = -1;
-    public int gameID = 109;
+    public int gameID = 101;
     public int areaID;
     public CountDown countDownTimer;
     public CoinStackData stackLeft, stackRight, stackBTL, stackBTR, stackTop, stackSuper;
@@ -203,9 +206,7 @@ public class BacSource extends CasinoSource{
             winPopup.show();
         }else if(bacData.protocol == 38){
             handle(() -> countDownTimer.start(bacData.data.timeMillisecond, i->{
-                if(!cardIsOpening){
-                    if(bridge != null) bridge.betCountdown(i);
-                }
+                 bridge.betCountdown(i);
             }));
         }
 

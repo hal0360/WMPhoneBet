@@ -39,7 +39,7 @@ import tw.com.lixin.wmphonebet.models.CoinHolder;
 import tw.com.lixin.wmphonebet.models.CostomCoinHolder;
 import tw.com.lixin.wmphonebet.websocketSource.BacSource;
 
-public class BacActivity extends RootActivity implements BacBridge {
+public class BacActivity extends WMActivity implements BacBridge {
     private int posX, posY;
     private Animation fadeAnimeB;
     private Move move;
@@ -136,8 +136,8 @@ public class BacActivity extends RootActivity implements BacBridge {
         stackSuper = findViewById(R.id.table_bt_super_stack);
         pokerContainer = findViewById(R.id.poker_layout);
 
-        pokers.put(3,findViewById(R.id.player_poker1));
-        pokers.put(1,findViewById(R.id.player_poker2));
+        pokers.put(1,findViewById(R.id.player_poker1));
+        pokers.put(3,findViewById(R.id.player_poker2));
         pokers.put(5,findViewById(R.id.player_poker3));
         pokers.put(2,findViewById(R.id.banker_poker1));
         pokers.put(4,findViewById(R.id.banker_poker2));
@@ -169,7 +169,7 @@ public class BacActivity extends RootActivity implements BacBridge {
             }
         });
 
-        clicked(R.id.cash_btn,v-> new PayPopup(this).show());
+        if(!isPortrait()) clicked(R.id.cash_btn,v-> new PayPopup(this).show());
 
         stackLeft.setUp(source.stackLeft);
         stackRight.setUp(source.stackRight);
@@ -235,7 +235,7 @@ public class BacActivity extends RootActivity implements BacBridge {
             checkStackEmpty();
         });
 
-        clicked(R.id.switch_table_btn, v -> new TableSwitchPopup(this).show());
+        if(!isPortrait()) clicked(R.id.switch_table_btn, v -> new TableSwitchPopup(this).show());
 
         confirmBtn.clicked(v -> {
             Client22 client22 = new Client22(source.groupID, source.areaID);
@@ -314,6 +314,7 @@ public class BacActivity extends RootActivity implements BacBridge {
             fourthGrid.setGridDouble(wGrid, 3);
             setMainGrid();
         });
+
     }
 
     private void checkStackEmpty() {
@@ -415,6 +416,8 @@ public class BacActivity extends RootActivity implements BacBridge {
     }
 
     public void resetPokers() {
+        if(source.cardIsOpening){pokerContainer.setVisibility(View.VISIBLE);
+        }else{ pokerContainer.setVisibility(View.INVISIBLE); }
         for(int y = 0; y < pokers.size(); y++) pokers.valueAt(y).setVisibility(View.INVISIBLE);
         for(int i = 0; i < source.pokers.size(); i++) {
             int key = source.pokers.keyAt(i);
@@ -456,7 +459,8 @@ public class BacActivity extends RootActivity implements BacBridge {
             gameStageTxt.setText("洗牌中");
         } else if (source.cardStatus == 1) {
             gameStageTxt.setText("請下注");
-            resetPokers();
+            pokerContainer.setVisibility(View.INVISIBLE);
+            resultUpadte();
             confirmBtn.disable(false);
         } else if (source.cardStatus == 2) {
             confirmBtn.disable(true);
@@ -466,7 +470,7 @@ public class BacActivity extends RootActivity implements BacBridge {
                 move.back(0);
                 viewIsZoomed = false;
             }
-            resetPokers();
+            pokerContainer.setVisibility(View.VISIBLE);
             gameStageTxt.setText("開牌中");
         } else if (source.cardStatus == 3) {
             gameStageTxt.setText("結算中");
@@ -493,7 +497,25 @@ public class BacActivity extends RootActivity implements BacBridge {
 
     @Override
     public void resultUpadte() {
-
+        if (source.pokerWin == 1) {
+            pokerBall.setText(getString(R.string.banker_score));
+            pokerBall.setBackgroundResource(R.drawable.casino_item_bt_bank);
+        } else if (source.pokerWin == 2) {
+            pokerBall.setText(getString(R.string.player_score));
+            pokerBall.setBackgroundResource(R.drawable.casino_item_bt_player);
+        } else if (source.pokerWin == 4) {
+            pokerBall.setText(getString(R.string.tie_score));
+            pokerBall.setBackgroundResource(R.drawable.casino_item_bt_tie);
+        }
+        if(source.pokerWin == -1){
+            playerScreenScore.setText("");
+            bankerScreenScore.setText("");
+            pokerBall.setVisibility(View.INVISIBLE);
+        }else{
+            playerScreenScore.setText(getString(R.string.player_score) + source.playerScore);
+            bankerScreenScore.setText(getString(R.string.banker_score) + source.bankerScore);
+            pokerBall.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -509,12 +531,13 @@ public class BacActivity extends RootActivity implements BacBridge {
 
     @Override
     public void gridUpdate() {
-
+        setMainGrid();
     }
 
     @Override
     public void betCountdown(int sec) {
-
+        gameStageTxt.setText("請下注" + sec);
+        if (sec <= 5) countdownBox.setBackgroundResource(R.drawable.casino_countdown2);
     }
 
 }
