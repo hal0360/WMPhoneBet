@@ -38,6 +38,21 @@ public class CoinStack extends ConstraintLayout implements Animation.AnimationLi
         init(context);
     }
 
+    public void cancelBet(){
+        data.cancelBet();
+        refresh();
+    }
+
+    public void repeatBet(){
+        data.repeatBet();
+        refresh();
+    }
+
+    public void clearCoin(){
+        data.clear();
+        reset();
+    }
+
     private void init(Context context) {
         View.inflate(context, R.layout.coin_stack_layout, this);
         setDescendantFocusability(FOCUS_BLOCK_DESCENDANTS);
@@ -48,7 +63,6 @@ public class CoinStack extends ConstraintLayout implements Animation.AnimationLi
         coin3 = findViewById(R.id.coin3);
         coin4 = findViewById(R.id.coin4);
         valTxt = findViewById(R.id.stack_value);
-
         coin1.setVisibility(View.INVISIBLE);
         coin2.setVisibility(View.INVISIBLE);
         coin3.setVisibility(View.INVISIBLE);
@@ -61,12 +75,17 @@ public class CoinStack extends ConstraintLayout implements Animation.AnimationLi
 
     public void setUp(CoinStackData cData){
         data = cData;
-        for(CoinHolder coin: data.addedCoin) addedAdd(coin);
-        for(CoinHolder coin: data.tempAddedCoin) addedAdd(coin);
+        for(CoinHolder coin: data.addedCoin) noAnimeAdd(coin);
+        for(CoinHolder coin: data.tempAddedCoin) noAnimeAdd(coin);
+    }
+
+    public void refresh(){
+        reset();
+        for(CoinHolder coin: data.addedCoin) noAnimeAdd(coin);
+        for(CoinHolder coin: data.tempAddedCoin) noAnimeAdd(coin);
     }
 
     private void reset(){
-        data.value = 0;
         hit = 0;
         valTxt.setText(data.value + "");
         coin1.setVisibility(View.INVISIBLE);
@@ -77,32 +96,10 @@ public class CoinStack extends ConstraintLayout implements Animation.AnimationLi
         ids = new ArrayList<>();
     }
 
-    public void clearCoin(){
-        reset();
-        data.addedCoin = new ArrayList<>();
-        data.tempAddedCoin = new ArrayList<>();
-    }
-
-    public void cancelBet(){
-        reset();
-        data.tempAddedCoin = new ArrayList<>();
-        for(CoinHolder coin: data.addedCoin) addedAdd(coin);
-    }
-
-    public void repeatBet(){
-        List<CoinHolder> repeatCoin = new ArrayList<>();
-        for(CoinHolder coin: data.tempAddedCoin){
-            addedAdd(coin);
-            repeatCoin.add(coin);
-        }
-        data.tempAddedCoin.addAll(repeatCoin);
-
-    }
-
     private void noAnimeAdd(CoinHolder coin){
         ids.add(coin.img_res);
         if(hit == 0){
-            coin4.setImageResource(coin.img_res);
+            coin1.setImageResource(coin.img_res);
             coin1.setVisibility(View.VISIBLE);
         }else if(hit == 1){
             coin2.setImageResource(coin.img_res);
@@ -125,38 +122,8 @@ public class CoinStack extends ConstraintLayout implements Animation.AnimationLi
         valTxt.setText(data.value + "");
     }
 
-    private void addedAdd(CoinHolder coin){
-        data.value = data.value + coin.value;
-        if(data.value > data.maxValue){
-            data.value = data.value - coin.value;
-            return;
-        }
-        noAnimeAdd(coin);
-    }
-
-    public void addCoinToClient(Client22 client22, int area){
-        for(CoinHolder coin: data.tempAddedCoin){
-            client22.addBet(area,coin.value);
-        }
-    }
-
-    public void comfirmBet(){
-        data.addedCoin.addAll(data.tempAddedCoin);
-        data.tempAddedCoin = new ArrayList<>();
-    }
-
-    public boolean isEmpty(){
-        return data.tempAddedCoin.size() == 0;
-    }
-
-    public boolean add(CoinHolder coin){
-        data.value = data.value + coin.value;
-        if(data.value > data.maxValue){
-            data.value = data.value - coin.value;
-            return false;
-        }
-
-        data.tempAddedCoin.add(coin);
+    public void add(CoinHolder coin){
+        if(!data.add(coin)) return;
         valTxt.setVisibility(View.VISIBLE);
         valTxt.setText(data.value + "");
         ids.add(coin.img_res);
@@ -183,7 +150,6 @@ public class CoinStack extends ConstraintLayout implements Animation.AnimationLi
             coin1.startAnimation(animeDwn);
         }
         hit++;
-        return true;
     }
 
     @Override
@@ -192,7 +158,6 @@ public class CoinStack extends ConstraintLayout implements Animation.AnimationLi
         coin2.setImageResource(ids.get(1));
         coin3.setImageResource(ids.get(2));
     }
-
     @Override
     public void onAnimationRepeat(Animation animation) {}
     @Override

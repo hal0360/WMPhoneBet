@@ -181,10 +181,9 @@ public class BacActivity extends WMActivity implements BacBridge {
 
         clicked(R.id.table_left, v -> {
             stackLeft.add(curCoin);
-            alert("added");
             checkStackEmpty();
         });
-        clicked(tableRight, v -> {
+        clicked(R.id.table_right, v -> {
             stackRight.add(curCoin);
             checkStackEmpty();
         });
@@ -238,17 +237,19 @@ public class BacActivity extends WMActivity implements BacBridge {
         if(!isPortrait()) clicked(R.id.switch_table_btn, v -> new TableSwitchPopup(this).show());
 
         confirmBtn.clicked(v -> {
+
             Client22 client22 = new Client22(source.groupID, source.areaID);
             if (source.comission) {
                 client22.data.commission = 1;
-                stackSuper.addCoinToClient(client22, 8);
+                source.stackSuper.addCoinToClient(client22, 8);
             }
-            stackBTR.addCoinToClient(client22, 4);
-            stackTop.addCoinToClient(client22, 3);
-            stackRight.addCoinToClient(client22, 1);
-            stackBTL.addCoinToClient(client22, 5);
-            stackLeft.addCoinToClient(client22, 2);
-            if (client22.data.betArr.size() > 0) source.send(Json.to(client22));
+            source.stackBTR.addCoinToClient(client22, 4);
+            source.stackTop.addCoinToClient(client22, 3);
+            source.stackRight.addCoinToClient(client22, 1);
+            source.stackBTL.addCoinToClient(client22, 5);
+            source.stackLeft.addCoinToClient(client22, 2);
+          //  if (client22.data.betArr.size() > 0) source.send(Json.to(client22));
+            if (client22.data.betArr.size() > 0) alert(Json.to(client22));
             else alert("You haven't put any money!");
         });
 
@@ -318,7 +319,7 @@ public class BacActivity extends WMActivity implements BacBridge {
     }
 
     private void checkStackEmpty() {
-        if (stackLeft.isEmpty() && stackBTL.isEmpty() && stackRight.isEmpty() && stackTop.isEmpty() && stackSuper.isEmpty() && stackBTR.isEmpty()) {
+        if (source.stackLeft.isEmpty() && source.stackBTL.isEmpty() && source.stackRight.isEmpty() && source.stackTop.isEmpty() && source.stackSuper.isEmpty() && source.stackBTR.isEmpty()) {
             cancelBtn.disable(true);
             repeatBtn.disable(true);
         } else {
@@ -525,6 +526,11 @@ public class BacActivity extends WMActivity implements BacBridge {
 
     @Override
     public void betUpdate(boolean betOK) {
+        if(betOK){
+            alert("nig");
+        }else{
+            alert("You haven't put any money!");
+        }
 
     }
 
