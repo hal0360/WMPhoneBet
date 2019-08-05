@@ -61,7 +61,6 @@ public class LobbySource extends CasinoSource{
 
     @Override
     public void onReceive(String text) {
-        Log.e("lobbySocket", text);
         LobbyData lobbyData = Json.from(text, LobbyData.class);
         switch(lobbyData.protocol) {
             case 35:
@@ -70,6 +69,7 @@ public class LobbySource extends CasinoSource{
                     if (game.gameID == 101)
                         bacGame = game;
                 }
+                Log.e("bacGame", Json.to(bacGame));
                 if(bacGame == null) return;
                 for(TableStage tableStage: bacGame.groupArr){
                     if ( tableStage.gameStage != 4){

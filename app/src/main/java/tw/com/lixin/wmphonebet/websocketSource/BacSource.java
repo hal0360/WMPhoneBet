@@ -36,9 +36,8 @@ public class BacSource extends CasinoSource{
 
     private BacBridge bridge;
     public boolean comission = false;
-    public boolean cardIsOpening = false;
-    public boolean isBettingNow = true;
-
+   // public boolean cardIsOpening = false;
+    //public boolean isBettingNow = true;
 
     public int groupID = -1;
     public int gameID = 101;
@@ -46,8 +45,8 @@ public class BacSource extends CasinoSource{
     public CountDown countDownTimer;
     public CoinStackData stackLeft, stackRight, stackBTL, stackBTR, stackTop, stackSuper;
     public SparseIntArray pokers;
-    public int cardStatus = 0;
-    public boolean displayCard = false;
+    public int status = 0;
+   // public boolean displayCard = false;
 
     public String tableRightScore;
     public String tableLeftScore;
@@ -91,6 +90,7 @@ public class BacSource extends CasinoSource{
         if(bacData.data.gameID != gameID || bacData.data.groupID != groupID) return;
         if(bacData.protocol == 10){
             if (bacData.data.bOk) {
+                comission = false;
                 stackSuper = new CoinStackData();
                 stackTop = new CoinStackData();
                 stackBTR = new CoinStackData();
@@ -119,20 +119,20 @@ public class BacSource extends CasinoSource{
                 cOk = null;
             });
         }else if(bacData.protocol == 20){
-            if (winPopup != null) winPopup.dismiss();
-            isBettingNow = false;
-            cardIsOpening = false;
-            displayCard = false;
+           // isBettingNow = false;
+          //  cardIsOpening = false;
+           // displayCard = false;
             if (bacData.data.gameStage == 1) {
+                if (winPopup != null) winPopup.dismiss();
                 pokers = new SparseIntArray();
-                isBettingNow = true;
+               // isBettingNow = true;
                 pokerWin = -1;
             } else if (bacData.data.gameStage == 2) {
-                cardIsOpening = true;
+              //  cardIsOpening = true;
                 countDownTimer.cancel();
-                displayCard = true;
+               // displayCard = true;
             }
-            cardStatus = bacData.data.gameStage;
+            status = bacData.data.gameStage;
             handle(() -> bridge.statusUpdate());
         }else if(bacData.protocol == 22){
             handle(() -> bridge.betUpdate(bacData.data.bOk));
@@ -205,8 +205,8 @@ public class BacSource extends CasinoSource{
             mText.setText(bacData.data.moneyWin + "");
             winPopup.show();
         }else if(bacData.protocol == 38){
-            handle(() -> countDownTimer.start(bacData.data.timeMillisecond, i->{
-                 bridge.betCountdown(i);
+            super.handle(() -> countDownTimer.start(bacData.data.timeMillisecond, i->{
+                if(bridge != null) bridge.betCountdown(i);
             }));
         }
 

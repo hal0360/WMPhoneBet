@@ -83,13 +83,14 @@ public abstract class CasinoSource extends WebSocketListener{
 
     @Override
     public void onMessage(WebSocket webSocket, String text) {
-
-        Log.e("webSocket", text);
-
         if(!connected){
             LoginResData logRespend = Json.from(text, LoginResData.class);
             if(logRespend.protocol == 0){
                 logHandler.removeCallbacksAndMessages(null);
+
+
+                Log.e("WebSocket", text);
+
                 if(logRespend.data.bOk){
                     connected = true;
                     cmdLogFail = null;

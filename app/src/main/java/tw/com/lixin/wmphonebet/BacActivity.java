@@ -67,7 +67,7 @@ public class BacActivity extends WMActivity implements BacBridge {
     private BacSource source;
 
     public void viewZoomOut(View view) {
-        if(!source.isBettingNow) return;
+        if(source.status != 1) return;
         if (viewIsZoomed) {
             move.back(300);
             viewIsZoomed = false;
@@ -248,8 +248,11 @@ public class BacActivity extends WMActivity implements BacBridge {
             source.stackRight.addCoinToClient(client22, 1);
             source.stackBTL.addCoinToClient(client22, 5);
             source.stackLeft.addCoinToClient(client22, 2);
-          //  if (client22.data.betArr.size() > 0) source.send(Json.to(client22));
-            if (client22.data.betArr.size() > 0) alert(Json.to(client22));
+
+            if (client22.data.betArr.size() > 0) {
+                alert(Json.to(client22));
+                source.send(Json.to(client22));
+            }
             else alert("You haven't put any money!");
         });
 
@@ -417,7 +420,7 @@ public class BacActivity extends WMActivity implements BacBridge {
     }
 
     public void resetPokers() {
-        if(source.cardIsOpening){pokerContainer.setVisibility(View.VISIBLE);
+        if(source.status == 2){pokerContainer.setVisibility(View.VISIBLE);
         }else{ pokerContainer.setVisibility(View.INVISIBLE); }
         for(int y = 0; y < pokers.size(); y++) pokers.valueAt(y).setVisibility(View.INVISIBLE);
         for(int i = 0; i < source.pokers.size(); i++) {
@@ -456,14 +459,14 @@ public class BacActivity extends WMActivity implements BacBridge {
 
     @Override
     public void statusUpdate() {
-        if (source.cardStatus == 0) {
+        if (source.status == 0) {
             gameStageTxt.setText("洗牌中");
-        } else if (source.cardStatus == 1) {
+        } else if (source.status == 1) {
             gameStageTxt.setText("請下注");
             pokerContainer.setVisibility(View.INVISIBLE);
             resultUpadte();
             confirmBtn.disable(false);
-        } else if (source.cardStatus == 2) {
+        } else if (source.status == 2) {
             confirmBtn.disable(true);
             cancelBtn.disable(true);
             repeatBtn.disable(true);
@@ -473,7 +476,7 @@ public class BacActivity extends WMActivity implements BacBridge {
             }
             pokerContainer.setVisibility(View.VISIBLE);
             gameStageTxt.setText("開牌中");
-        } else if (source.cardStatus == 3) {
+        } else if (source.status == 3) {
             gameStageTxt.setText("結算中");
         } else {
 
@@ -521,7 +524,7 @@ public class BacActivity extends WMActivity implements BacBridge {
 
     @Override
     public void balanceUpdate(float value) {
-
+       // alert("balanceUpdate");
     }
 
     @Override
