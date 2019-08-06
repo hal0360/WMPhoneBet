@@ -59,7 +59,6 @@ public class BacSource extends CasinoSource{
     public int playerScore, bankerScore;
     private CmdBool cOk;
     public Table table;
-    private Popup winPopup;
 
     public void bind(BacBridge bridge){
         this.bridge = bridge;
@@ -123,7 +122,6 @@ public class BacSource extends CasinoSource{
           //  cardIsOpening = false;
            // displayCard = false;
             if (bacData.data.gameStage == 1) {
-                if (winPopup != null) winPopup.dismiss();
                 pokers = new SparseIntArray();
                // isBettingNow = true;
                 pokerWin = -1;
@@ -135,6 +133,14 @@ public class BacSource extends CasinoSource{
             status = bacData.data.gameStage;
             handle(() -> bridge.statusUpdate());
         }else if(bacData.protocol == 22){
+            if(bacData.data.bOk){
+                stackLeft.comfirmBet();
+                stackRight.comfirmBet();
+                stackBTL.comfirmBet();
+                stackBTR.comfirmBet();
+                stackTop.comfirmBet();
+                stackSuper.comfirmBet();
+            }
             handle(() -> bridge.betUpdate(bacData.data.bOk));
         }else if(bacData.protocol == 23){
             handle(() -> bridge.balanceUpdate(bacData.data.balance));
@@ -151,59 +157,7 @@ public class BacSource extends CasinoSource{
             handle(() -> bridge.gridUpdate());
         }else if(bacData.protocol == 31){
             if(User.memberID() != bacData.data.memberID || bridge == null) return;
-            Context context = (Context) bridge;
-            winPopup = new Popup(context, R.layout.win_loss_popup);
-            TextView mText = winPopup.findViewById(R.id.player_bet);
-            mText.setText(stackLeft.value + "");
-            mText = winPopup.findViewById(R.id.banker_bet);
-            mText.setText(stackRight.value + "");
-            mText = winPopup.findViewById(R.id.player_pair_bet);
-            mText.setText(stackBTL.value + "");
-            mText = winPopup.findViewById(R.id.banker_pair_bet);
-            mText.setText(stackBTR.value + "");
-            mText = winPopup.findViewById(R.id.tie_bet);
-            mText.setText(stackTop.value + "");
-            mText = winPopup.findViewById(R.id.super_bet);
-            mText.setText(stackSuper.value + "");
-            mText = winPopup.findViewById(R.id.player_win);
-            if (bacData.data.dtMoneyWin.get(2) == null) {
-                mText.setText("");
-            } else {
-                mText.setText(bacData.data.dtMoneyWin.get(2) + "");
-            }
-            mText = winPopup.findViewById(R.id.banker_win);
-            if (bacData.data.dtMoneyWin.get(1) == null) {
-                mText.setText("");
-            } else {
-                mText.setText(bacData.data.dtMoneyWin.get(1) + "");
-            }
-            mText = winPopup.findViewById(R.id.player_pair_win);
-            if (bacData.data.dtMoneyWin.get(5) == null) {
-                mText.setText("");
-            } else {
-                mText.setText(bacData.data.dtMoneyWin.get(5) + "");
-            }
-            mText = winPopup.findViewById(R.id.banker_pair_win);
-            if (bacData.data.dtMoneyWin.get(4) == null) {
-                mText.setText("");
-            } else {
-                mText.setText(bacData.data.dtMoneyWin.get(4) + "");
-            }
-            mText = winPopup.findViewById(R.id.tie_win);
-            if (bacData.data.dtMoneyWin.get(3) == null) {
-                mText.setText("");
-            } else {
-                mText.setText(bacData.data.dtMoneyWin.get(3) + "");
-            }
-            mText = winPopup.findViewById(R.id.super_win);
-            if (bacData.data.dtMoneyWin.get(8) == null) {
-                mText.setText("");
-            } else {
-                mText.setText(bacData.data.dtMoneyWin.get(8) + "");
-            }
-            mText = winPopup.findViewById(R.id.total_win_money);
-            mText.setText(bacData.data.moneyWin + "");
-            winPopup.show();
+            handle(() -> bridge.winLossUpdate(bacData));
         }else if(bacData.protocol == 38){
             super.handle(() -> countDownTimer.start(bacData.data.timeMillisecond, i->{
                 if(bridge != null) bridge.betCountdown(i);

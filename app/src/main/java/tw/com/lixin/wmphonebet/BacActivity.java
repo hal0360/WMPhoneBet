@@ -32,8 +32,10 @@ import tw.com.lixin.wmphonebet.Tools.Move;
 import tw.com.lixin.wmphonebet.Tools.PayPopup;
 import tw.com.lixin.wmphonebet.Tools.SettingPopup;
 import tw.com.lixin.wmphonebet.Tools.TableSwitchPopup;
+import tw.com.lixin.wmphonebet.Tools.WinLossPopup;
 import tw.com.lixin.wmphonebet.global.User;
 import tw.com.lixin.wmphonebet.interfaces.BacBridge;
+import tw.com.lixin.wmphonebet.jsonData.BacData;
 import tw.com.lixin.wmphonebet.jsonData.Client22;
 import tw.com.lixin.wmphonebet.models.CoinHolder;
 import tw.com.lixin.wmphonebet.models.CostomCoinHolder;
@@ -64,6 +66,7 @@ public class BacActivity extends WMActivity implements BacBridge {
 
     private IjkVideoView video;
 
+    private WinLossPopup popup;
     private BacSource source;
 
     public void viewZoomOut(View view) {
@@ -96,6 +99,7 @@ public class BacActivity extends WMActivity implements BacBridge {
         video = findViewById(R.id.player);
         video.setVideoPath(path);
         video.start();
+        popup = new WinLossPopup(this);
 
         root = findViewById(R.id.root);
         confirmBtn = findViewById(R.id.confirm_bet_btn);
@@ -238,7 +242,7 @@ public class BacActivity extends WMActivity implements BacBridge {
 
         confirmBtn.clicked(v -> {
 
-            Client22 client22 = new Client22(source.groupID, source.areaID);
+            Client22 client22 = new Client22();
             if (source.comission) {
                 client22.data.commission = 1;
                 source.stackSuper.addCoinToClient(client22, 8);
@@ -318,7 +322,6 @@ public class BacActivity extends WMActivity implements BacBridge {
             fourthGrid.setGridDouble(wGrid, 3);
             setMainGrid();
         });
-
     }
 
     private void checkStackEmpty() {
@@ -462,9 +465,11 @@ public class BacActivity extends WMActivity implements BacBridge {
         if (source.status == 0) {
             gameStageTxt.setText("洗牌中");
         } else if (source.status == 1) {
+            popup.dismiss();
             gameStageTxt.setText("請下注");
             pokerContainer.setVisibility(View.INVISIBLE);
             resultUpadte();
+            resetCoinStacks();
             confirmBtn.disable(false);
         } else if (source.status == 2) {
             confirmBtn.disable(true);
@@ -524,15 +529,15 @@ public class BacActivity extends WMActivity implements BacBridge {
 
     @Override
     public void balanceUpdate(float value) {
-       // alert("balanceUpdate");
+       setTextView(R.id.player_money, value + "");
     }
 
     @Override
     public void betUpdate(boolean betOK) {
         if(betOK){
-            alert("nig");
+            alert("bet succ!");
         }else{
-            alert("You haven't put any money!");
+            alert("fail!");
         }
 
     }
@@ -547,6 +552,12 @@ public class BacActivity extends WMActivity implements BacBridge {
     public void betCountdown(int sec) {
         gameStageTxt.setText("請下注" + sec);
         if (sec <= 5) countdownBox.setBackgroundResource(R.drawable.casino_countdown2);
+    }
+
+    @Override
+    public void winLossUpdate(BacData data) {
+        popup.setUp(source, data);
+        popup.show();
     }
 
 }
