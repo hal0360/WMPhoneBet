@@ -86,8 +86,6 @@ public class LobbyActivity extends WMActivity implements LobbyBridge {
             });
         }
 
-
-
         source.bind(this);
         if(source.isConnected()) return;
         loading();

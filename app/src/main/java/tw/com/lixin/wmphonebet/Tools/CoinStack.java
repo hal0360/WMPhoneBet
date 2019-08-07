@@ -99,7 +99,7 @@ public class CoinStack extends ConstraintLayout implements Animation.AnimationLi
     private void noAnimeAdd(CoinHolder coin){
         ids.add(coin.img_res);
         if(hit == 0){
-            coin1.setImageResource(coin.img_res);
+            coin1 .setImageResource(coin.img_res);
             coin1.setVisibility(View.VISIBLE);
         }else if(hit == 1){
             coin2.setImageResource(coin.img_res);
