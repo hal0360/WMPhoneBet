@@ -1,5 +1,6 @@
 package tw.com.lixin.wmphonebet.models;
 
+import android.graphics.Color;
 import android.os.Build;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -32,18 +33,18 @@ public class VerticalTableHolder extends ItemHolder {
         CasinoGrid grid = findViewById(R.id.road_grid);
 
         grid.post(() -> {
+            grid.setBackgroundColor(Color.parseColor("#ffffff"));
             double dim = grid.getMeasuredHeight() / 6.0;
             int wGrid = (int) Math.round(grid.getMeasuredWidth()/dim);
             grid.setGrid(wGrid, 6);
             grid.drawRoad(table.firstGrid);
-        });
 
+        });
 
         TextView gyuTxt = findViewById(R.id.gyu_shu);
         gyuTxt.setText(getContex().getString(R.string.table_number) + "  " + table.number + " -- " + table.round);
         TextView numTxt = findViewById(R.id.table_num);
         numTxt.setText(String.format(Locale.US,"%02d", table.groupID));
-
 
         clicked(R.id.table_grid,v->{
             WMActivity activity = (WMActivity) getContex();
@@ -51,7 +52,6 @@ public class VerticalTableHolder extends ItemHolder {
 
 
             source.tableLogin(table,ok->{
-                Kit.alert(activity,"gsgscc");
                 if(ok){
                     activity.toActivity(BacActivity.class);
 

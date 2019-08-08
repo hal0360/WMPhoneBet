@@ -44,11 +44,11 @@ public class LobbyActivity extends WMActivity implements LobbyBridge {
 
 
         for(Table table: source.tables){
-            if (!isPortrait()) {
+           // if (!isPortrait()) {
                 holders.add(new TableHolder(table));
-            } else {
-                holders.add(new VerticalTableHolder(table));
-            }
+          //  } else {
+              //  holders.add(new VerticalTableHolder(table));
+           // }
         }
 
         /*

@@ -465,6 +465,12 @@ public class BacActivity extends WMActivity implements BacBridge {
         if (source.status == 0) {
             gameStageTxt.setText("洗牌中");
         } else if (source.status == 1) {
+            stackLeft.disable(false);
+            stackRight.disable(false);
+            stackTop.disable(false);
+            stackBTL.disable(false);
+            stackBTR.disable(false);
+            stackSuper.disable(false);
             popup.dismiss();
             gameStageTxt.setText("請下注");
             pokerContainer.setVisibility(View.INVISIBLE);
@@ -472,6 +478,12 @@ public class BacActivity extends WMActivity implements BacBridge {
             resetCoinStacks();
             confirmBtn.disable(false);
         } else if (source.status == 2) {
+            stackLeft.disable(true);
+            stackRight.disable(true);
+            stackTop.disable(true);
+            stackBTL.disable(true);
+            stackBTR.disable(true);
+            stackSuper.disable(true);
             confirmBtn.disable(true);
             cancelBtn.disable(true);
             repeatBtn.disable(true);

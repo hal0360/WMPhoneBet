@@ -139,7 +139,6 @@ public class LoginActivity extends WMActivity implements LobbyBridge {
     @Override
     public void wholeDataUpdated() {
         unloading();
-        alert(source.tables.size()+"");
         if(!isPortrait()){
             setTextView(R.id.table_txt, source.tables.size()+"");
         }

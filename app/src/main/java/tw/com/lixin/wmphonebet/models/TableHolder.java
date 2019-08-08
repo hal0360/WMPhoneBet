@@ -20,7 +20,7 @@ public class TableHolder extends ItemHolder {
     private Table table;
 
     public TableHolder(Table table) {
-        super(R.layout.table_item);
+        super(R.layout.super_item);
         this.table = table;
     }
 

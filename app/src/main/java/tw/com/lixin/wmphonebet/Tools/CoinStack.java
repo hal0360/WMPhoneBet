@@ -27,6 +27,11 @@ public class CoinStack extends ConstraintLayout implements Animation.AnimationLi
     private List<Integer> ids = new ArrayList<>();
     private TextView valTxt;
     public CoinStackData data;
+    private Boolean disabled = true;
+
+    public void disable(Boolean disabled){
+        this.disabled = disabled;
+    }
 
     public CoinStack(Context context) {
         super(context);
@@ -123,6 +128,7 @@ public class CoinStack extends ConstraintLayout implements Animation.AnimationLi
     }
 
     public void add(CoinHolder coin){
+        if(disabled) return;
         if(!data.add(coin)) return;
         valTxt.setVisibility(View.VISIBLE);
         valTxt.setText(data.value + "");
