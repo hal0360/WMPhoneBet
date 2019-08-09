@@ -43,7 +43,7 @@ public class TableHolder extends ItemHolder {
             source.tableLogin(table,ok->{
                 if(ok){
 
-                    activity.toActivity(BacActivity.class);
+                    activity.pushActivity(BacActivity.class);
 
                 }else{
                     Kit.alert(activity,"Cannot go to this table ");

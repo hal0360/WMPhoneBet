@@ -238,7 +238,7 @@ public class BacActivity extends WMActivity implements BacBridge {
             checkStackEmpty();
         });
 
-        if(!isPortrait()) clicked(R.id.switch_table_btn, v -> new TableSwitchPopup(this).show());
+     //   if(!isPortrait()) clicked(R.id.switch_table_btn, v -> new TableSwitchPopup(this).show());
 
         confirmBtn.clicked(v -> {
 
@@ -254,7 +254,7 @@ public class BacActivity extends WMActivity implements BacBridge {
             source.stackLeft.addCoinToClient(client22, 2);
 
             if (client22.data.betArr.size() > 0) {
-                alert(Json.to(client22));
+                //alert(Json.to(client22));
                 source.send(Json.to(client22));
             }
             else alert("You haven't put any money!");
@@ -389,11 +389,7 @@ public class BacActivity extends WMActivity implements BacBridge {
         }
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        // onBackPressed();
-    }
+
 
     private void setMainGrid() {
         int indexx = 0;
@@ -462,6 +458,7 @@ public class BacActivity extends WMActivity implements BacBridge {
 
     @Override
     public void statusUpdate() {
+        pokerContainer.setVisibility(View.VISIBLE);
         if (source.status == 0) {
             gameStageTxt.setText("洗牌中");
         } else if (source.status == 1) {
@@ -475,7 +472,7 @@ public class BacActivity extends WMActivity implements BacBridge {
             gameStageTxt.setText("請下注");
             pokerContainer.setVisibility(View.INVISIBLE);
             resultUpadte();
-            resetCoinStacks();
+
             confirmBtn.disable(false);
         } else if (source.status == 2) {
             stackLeft.disable(true);
@@ -491,10 +488,11 @@ public class BacActivity extends WMActivity implements BacBridge {
                 move.back(0);
                 viewIsZoomed = false;
             }
-            pokerContainer.setVisibility(View.VISIBLE);
+
             gameStageTxt.setText("開牌中");
         } else if (source.status == 3) {
             gameStageTxt.setText("結算中");
+            resetCoinStacks();
         } else {
 
         }
